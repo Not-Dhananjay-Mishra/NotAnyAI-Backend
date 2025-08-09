@@ -55,6 +55,8 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 		log.Fatal(err)
 	}
 	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
+		res, _ := json.Marshal(result)
+		log.Println(string(res))
 		log.Println("No candidates or parts returned from model")
 		return "Sorry, I couldn't find any information for that."
 	}
