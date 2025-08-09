@@ -32,6 +32,10 @@ type Agent struct {
 
 func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) string {
 	ctx := context.Background()
+	if len(prompt) == 0 || len(prompt[len(prompt)-1].Parts) == 0 {
+		log.Println("Prompt or parts is empty")
+		return "Invalid prompt"
+	}
 	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
 	result, err := c.Models.GenerateContent(
 		ctx,
