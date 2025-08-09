@@ -22,7 +22,7 @@ func HandleConn(conn *websocket.Conn, username string) {
 		delete(utils.LiveConn, conn)
 		delete(utils.UserConn, username)
 		delete(utils.ConnUser, conn)
-		delete(utils.MemoryStore, username)
+		//delete(utils.MemoryStore, username)
 		conn.Close()
 	}()
 	client := models.GeminiModel()
