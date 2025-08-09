@@ -74,7 +74,7 @@ func AIScrapper(c *genai.Client, url1 string) string {
 	}, genai.RoleModel)
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.0-flash",
+		"gemini-2.5-flash",
 		[]*genai.Content{prompt},
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
