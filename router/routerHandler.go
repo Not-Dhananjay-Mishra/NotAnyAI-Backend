@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"server/auth"
 	"server/utils"
 
@@ -13,13 +14,12 @@ import (
 
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Replace with your frontend port if needed
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		// Change origin to your frontend domain in production
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
-		// Handle preflight request
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
@@ -33,13 +33,12 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		return true // allow all origins for WebSocket
 	},
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	tkn := r.URL.Query().Get("token")
-	//log.Println(tkn)
 	remoteAddr := r.RemoteAddr
 	username := WSSGateKeeper(tkn)
 
@@ -59,7 +58,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	log.Println("New WebSocket Connection from IP:", remoteAddr, utils.Yellow(" username: ", username), utils.Cyan(" Total Connections : ", CountConn()))
 	defer conn.Close()
 	HandleConn(conn, username)
-
 }
 
 func RouterHandler() {
@@ -68,12 +66,18 @@ func RouterHandler() {
 	router.HandleFunc("/login", auth.Login).Methods("POST")
 	router.HandleFunc("/register", auth.Register).Methods("POST")
 	router.HandleFunc("/validate", auth.GateKeeper).Methods("GET")
+
 	corsWrappedRouter := corsMiddleware(router)
-	fmt.Println("Server running on", ":8000")
-	err := http.ListenAndServe(":8000", corsWrappedRouter)
+
+	// Use dynamic port in production
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000" // default for local development
+	}
+	fmt.Println("Server running on port", port)
+	err := http.ListenAndServe(":"+port, corsWrappedRouter)
 	if err != nil {
 		fmt.Println("Server Failed to start!")
 		panic(err)
 	}
-
 }
