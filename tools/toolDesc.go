@@ -269,7 +269,7 @@ var ToolDeciderAgent = genai.FunctionDeclaration{
 			},
 			"google_search_aitool": {
 				Type:        genai.TypeObject,
-				Description: "Configuration for google search ai tools.",
+				Description: "search the web and give infomation of pages. better",
 				Properties: map[string]*genai.Schema{
 					"usetool": {
 						Type:        genai.TypeBoolean,
@@ -284,7 +284,7 @@ var ToolDeciderAgent = genai.FunctionDeclaration{
 			},
 			"google_searchtool": {
 				Type:        genai.TypeObject,
-				Description: "Configuration for google search tools.",
+				Description: "search the web and give infomation of pages.",
 				Properties: map[string]*genai.Schema{
 					"usetool": {
 						Type:        genai.TypeBoolean,

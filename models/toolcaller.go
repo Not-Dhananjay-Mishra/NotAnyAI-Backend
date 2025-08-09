@@ -84,7 +84,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 						fmt.Println(utils.Yellow("RESTGoogleSearch: "), link[i])
 					}*/
 					mu.Lock()
-					functiondata = append(functiondata, allFunctionResponse{FunctionName: "GoogleSearchTool", Query: query, Response: map[string]any{"link": link, "html-content": data}})
+					functiondata = append(functiondata, allFunctionResponse{FunctionName: "GoogleSearchTool", Query: query, Response: map[string]any{"link": link, "content": data}})
 					mu.Unlock()
 				}
 			}(query)

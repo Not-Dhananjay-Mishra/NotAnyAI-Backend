@@ -13,6 +13,11 @@ import (
 
 func PostProcessing(c *genai.Client, username string, content []*genai.Content, lastquery string, prompt []*genai.Content) string {
 	ctx := context.Background()
+	sus := `You have received responses from multiple function calls related to the user’s query. Your task is to:
+	- Combine and process these responses to generate a clear, concise, and relevant final answer for the user with all infomation needed.
+	- Only and only request additional information or call other tools if the current responses are insufficient to fully answer the query avoid if u can dont call same tool with same query again.
+	- Avoid unnecessary repetition or unrelated details.
+	- Present the final output in a user-friendly and informative way.`
 	//content = append(content, genai.NewContentFromText(lastquery, genai.RoleUser))
 	result, err := c.Models.GenerateContent(
 		ctx,
@@ -25,7 +30,7 @@ func PostProcessing(c *genai.Client, username string, content []*genai.Content, 
 						&tools.ToolDeciderAgent},
 				},
 			},
-			SystemInstruction: &genai.Content{Parts: []*genai.Part{{Text: "These are response from fucntion calls post process it to give final output to user, if more info needed u can call tool but call only if u need more infomation"}}},
+			SystemInstruction: &genai.Content{Parts: []*genai.Part{{Text: sus}}},
 		},
 	)
 	if err != nil {

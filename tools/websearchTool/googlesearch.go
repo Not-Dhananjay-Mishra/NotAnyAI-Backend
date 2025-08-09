@@ -46,6 +46,7 @@ func RESTGoogleSearch(query string) ([]string, []string) {
 		APIKey:  utils.GEMINI_API,
 		Backend: genai.BackendGeminiAPI,
 	})
+	//log.Println("url done")
 	if len(result.Items) > 2 {
 		for i := 0; i < 2; i++ {
 			links = append(links, result.Items[i].Link)
@@ -61,7 +62,7 @@ func RESTGoogleSearch(query string) ([]string, []string) {
 		wg.Wait()
 
 	}
-	log.Println("url done")
+
 	return links, data
 }
 

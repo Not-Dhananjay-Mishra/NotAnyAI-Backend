@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"server/utils"
 
 	"google.golang.org/genai"
 )
@@ -71,7 +72,7 @@ func AIScrapper(c *genai.Client, url1 string) string {
 
 	prompt := genai.NewContentFromParts([]*genai.Part{
 		{Text: sus},
-	}, genai.RoleModel)
+	}, genai.RoleUser)
 	result, err := c.Models.GenerateContent(
 		ctx,
 		"gemini-2.5-flash",
@@ -91,6 +92,6 @@ func AIScrapper(c *genai.Client, url1 string) string {
 
 	// Print the model's response.
 	res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].Text)
-	//fmt.Println(utils.Blue(string(res)))
+	fmt.Println(utils.Blue(string(res)))
 	return (string(res))
 }
