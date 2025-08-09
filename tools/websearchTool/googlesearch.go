@@ -61,6 +61,7 @@ func RESTGoogleSearch(query string) ([]string, []string) {
 		wg.Wait()
 
 	}
+	log.Println("url done")
 	return links, data
 }
 
