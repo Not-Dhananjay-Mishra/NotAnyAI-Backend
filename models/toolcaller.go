@@ -18,6 +18,7 @@ type allFunctionResponse struct {
 }
 
 func ToolCaller(data Agent, lastquery string) []*genai.Content {
+	var mu sync.Mutex
 	var FunctionContent []*genai.Content
 	var functiondata []allFunctionResponse
 	FunctionContent = append(FunctionContent, genai.NewContentFromText(lastquery, genai.RoleUser))
@@ -31,7 +32,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 				defer wg.Done()
 				res := websearchtool.AIGoogleSearch(q)
 				//fmt.Println(utils.Yellow("AIGoogleSearchTool: "), res)
+				mu.Lock()
 				functiondata = append(functiondata, allFunctionResponse{FunctionName: "AIGoogleSearchTool", Query: query, Response: res})
+				mu.Unlock()
 			}(query)
 		}
 	}
@@ -44,7 +47,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 				defer wg.Done()
 				res := individualtool.WikiDeepSearch(q)
 				//fmt.Println(utils.Yellow("DeepWikipediaSearchTool: "), res)
+				mu.Lock()
 				functiondata = append(functiondata, allFunctionResponse{FunctionName: "DeepWikipediaSearchTool", Query: query, Response: res})
+				mu.Unlock()
 			}(query)
 		}
 	}
@@ -60,7 +65,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 					/*for i := range res {
 						fmt.Println(utils.Yellow("GithubSearchTool: "), res[i].FullName)
 					}*/
+					mu.Lock()
 					functiondata = append(functiondata, allFunctionResponse{FunctionName: "GithubSearchTool", Query: query, Response: res})
+					mu.Unlock()
 				}
 			}(query)
 		}
@@ -76,7 +83,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 					/*for i := range link {
 						fmt.Println(utils.Yellow("RESTGoogleSearch: "), link[i])
 					}*/
+					mu.Lock()
 					functiondata = append(functiondata, allFunctionResponse{FunctionName: "GoogleSearchTool", Query: query, Response: map[string]any{"link": link, "html-content": data}})
+					mu.Unlock()
 				}
 			}(query)
 		}
@@ -94,7 +103,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 						fmt.Println(utils.Yellow("NewsSearchTool: "), res[i].Description)
 
 					}*/
+					mu.Lock()
 					functiondata = append(functiondata, allFunctionResponse{FunctionName: "NewsSearchTool", Query: query, Response: res})
+					mu.Unlock()
 				}
 			}(query)
 		}
@@ -129,7 +140,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 				defer wg.Done()
 				name, temp, description := individualtool.WeatherTool(q)
 				//fmt.Println(utils.Yellow("WeatherTool: "), name, temp, description)
+				mu.Lock()
 				functiondata = append(functiondata, allFunctionResponse{FunctionName: "WeatherTool", Query: query, Response: map[string]any{"place": name, "temp": temp, "description": description}})
+				mu.Unlock()
 			}(query)
 		}
 	}
@@ -142,7 +155,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 				defer wg.Done()
 				res := individualtool.WikiSummarySearch(q)
 				//fmt.Println(utils.Yellow("WikipediaSearchTool: "), res)
+				mu.Lock()
 				functiondata = append(functiondata, allFunctionResponse{FunctionName: "WikipediaSearchTool", Query: query, Response: res})
+				mu.Unlock()
 			}(query)
 		}
 	}
@@ -158,7 +173,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 					/*for i := range link {
 						fmt.Println(utils.Yellow("YoutubePlaylistTool: "), link[i], title[i], descriptions[i])
 					}*/
+					mu.Lock()
 					functiondata = append(functiondata, allFunctionResponse{FunctionName: "YoutubePlaylistTool", Query: query, Response: map[string]any{"link": link, "title": title, "description": descriptions}})
+					mu.Unlock()
 				}
 			}(query)
 		}
@@ -175,7 +192,9 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 					/*for i := range res {
 						fmt.Println(utils.Yellow("YoutubeVideoTool: "), res[i].Title, res[i].Link)
 					}*/
+					mu.Lock()
 					functiondata = append(functiondata, allFunctionResponse{FunctionName: "YoutubeVideoTool", Query: query, Response: res})
+					mu.Unlock()
 				}
 			}(query)
 		}

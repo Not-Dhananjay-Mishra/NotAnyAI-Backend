@@ -39,7 +39,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.0-flash",
+		"gemini-2.5-flash",
 		prompt,
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
@@ -57,6 +57,9 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
 		res, _ := json.Marshal(result)
 		log.Println(string(res))
+		for i := range prompt {
+			log.Println(prompt[i].Parts)
+		}
 		log.Println("No candidates or parts returned from model")
 		return "Sorry, I couldn't find any information for that."
 	}
