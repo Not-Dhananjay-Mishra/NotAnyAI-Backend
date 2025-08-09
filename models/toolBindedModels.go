@@ -54,15 +54,20 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 	if err != nil {
 		log.Fatal(err)
 	}
-	tkn, _ := json.Marshal(result.UsageMetadata.TotalTokenCount)
-	fmt.Println("Total Token used: ", string(tkn))
-	if result.Candidates[0].Content.Parts[0].Text != "" {
-		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].Text)
+	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
+		log.Println("No candidates or parts returned from model")
+		return "Sorry, I couldn't find any information for that."
+	}
+
+	part := result.Candidates[0].Content.Parts[0]
+
+	if part.Text != "" {
+		res, _ := json.Marshal(part.Text)
 		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(string(res), genai.RoleModel))
 		fmt.Println(utils.Yellow("AI : "), string(res))
 		return string(res)
-	} else if result.Candidates[0].Content.Parts[0].FunctionCall.Name != "" {
-		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
+	} else if part.FunctionCall.Name != "" {
+		res, _ := json.Marshal(part.FunctionCall.Args)
 		var data Agent
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
@@ -70,7 +75,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt)
 		return sus
 	} else {
-		log.Println("Error Proscessing request")
-		return "Error Proscessing request"
+		log.Println("Error processing request: No text or function call")
+		return "Error processing request"
 	}
 }
