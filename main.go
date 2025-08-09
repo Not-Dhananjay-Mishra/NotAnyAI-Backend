@@ -9,21 +9,24 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	/*username := "techdm"
-	client := models.GeminiModel()
-	prompt := "tell me about latest india news"
-	models.AddToMemoryUSER(username, prompt)
-	models.ModelWithTools(client, utils.MemoryStore[username], username)
-
-	prompt = "what can be its major impact"
-	models.AddToMemoryUSER(username, prompt)
-	models.ModelWithTools(client, utils.MemoryStore[username], username)*/
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+func loadEnv() {
+	// Only load from .env if it exists (local dev)
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Load(); err != nil {
+			log.Println("Warning: Could not load .env file:", err)
+		} else {
+			log.Println("Loaded environment variables from .env")
+		}
+	} else {
+		log.Println(".env file not found, assuming environment variables are set by the host")
 	}
-	//Loading env
+}
+
+func main() {
+	// Load env variables for local development
+	loadEnv()
+
+	// Assign environment variables to utils
 	utils.GEMINI_API = os.Getenv("GEMINI_API")
 	utils.NEWS_API = os.Getenv("NEWS_API")
 	utils.GOOGLE_SEARCH_API = os.Getenv("GOOGLE_SEARCH_API")
@@ -34,9 +37,10 @@ func main() {
 	utils.STACKOVERFLOW_API = os.Getenv("STACKOVERFLOW_API")
 	utils.WEATHER_API = os.Getenv("WEATHER_API")
 
+	// Start servers
 	blocker := make(chan any)
-
 	go router.RouterHandler()
+
 	log.Println(utils.Green("Websocket Server Started on localhost:8000/wss/contact"))
 	log.Println(utils.Green("REST API Server Started on localhost:8000/login"))
 	log.Println(utils.Green("REST API Server Started on localhost:8000/register"))
