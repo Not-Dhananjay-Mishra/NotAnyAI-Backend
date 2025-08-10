@@ -35,4 +35,7 @@ func CacheContext(client *genai.Client, prompt string) {
 }
 func AddToMemoryUSER(username string, prompt string) {
 	utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(prompt, genai.RoleUser))
+	for len(utils.MemoryStore[username]) > 20 {
+		utils.MemoryStore[username] = utils.MemoryStore[username][1:]
+	}
 }
