@@ -14,11 +14,12 @@ func StreamPostProcessing(c *genai.Client, username string, content []*genai.Con
 	log.Println("Reached SPP")
 	ctx := context.Background()
 	conn.WriteJSON(utils.Response{Text: "Processing request..."})
-	sus := `You have received responses from multiple function calls related to the user’s query. Your task is to:
+	sus := `You have received responses from multiple function calls related to the user’s query or direct query from user. Your task is to:
 	- Combine and process these responses to generate a clear, concise, and relevant final answer for the user with all infomation needed.
 	- Only and only request additional information or call other tools if the current responses are insufficient to fully answer the query avoid if u can dont call same tool with same query again.
 	- Avoid unnecessary repetition or unrelated details.
-	- Present the final output in a user-friendly and informative way.`
+	- Present the final output in a user-friendly and informative way.
+	- If you recive direct query answer directly with your own knowledge, do so without calling tools.`
 	//content = append(content, genai.NewContentFromText(lastquery, genai.RoleUser))
 	fmt.Println(content)
 	result := c.Models.GenerateContentStream(

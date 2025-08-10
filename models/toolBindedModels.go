@@ -92,7 +92,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		}
 		var temp []*genai.Content
 		temp = append(temp, genai.NewContentFromText(prompt[len(prompt)-1].Parts[0].Text, genai.RoleUser))
-		temp = append(temp, genai.NewContentFromText(ans, genai.RoleUser))
+		//temp = append(temp, genai.NewContentFromText(ans, genai.RoleUser))
 		sus := StreamPostProcessing(c, username, temp, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		fmt.Println(utils.Yellow("AI : "), sus)
 		return sus
