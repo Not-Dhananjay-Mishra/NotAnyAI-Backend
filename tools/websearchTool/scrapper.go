@@ -75,7 +75,7 @@ func AIScrapper(c *genai.Client, url1 string) string {
 	}, genai.RoleUser)
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.5-pro",
+		"gemini-2.5-flash",
 		[]*genai.Content{prompt},
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
@@ -87,7 +87,9 @@ func AIScrapper(c *genai.Client, url1 string) string {
 		},
 	)
 	if err != nil {
-		log.Fatal(err)
+		res, _ := json.Marshal(result)
+		log.Println(err)
+		return string(res)
 	}
 
 	// Print the model's response.

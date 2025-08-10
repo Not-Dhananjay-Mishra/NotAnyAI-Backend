@@ -23,7 +23,7 @@ func PostProcessing(c *genai.Client, username string, content []*genai.Content, 
 	//content = append(content, genai.NewContentFromText(lastquery, genai.RoleUser))
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.5-pro",
+		"gemini-2.5-flash",
 		content,
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{

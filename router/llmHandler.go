@@ -16,10 +16,12 @@ type recived struct {
 func HandleConn(conn *websocket.Conn, username string) {
 	defer func() {
 		log.Println(utils.Magenta("Cleaning up user: ", username))
+		//conn.ReadJSON(utils.Response{Text: "Error Encountered Report to Developer"})
 		delete(utils.LiveConn, conn)
 		delete(utils.UserConn, username)
 		delete(utils.ConnUser, conn)
-		//delete(utils.MemoryStore, username)
+		delete(utils.MemoryStore, username)
+
 		conn.Close()
 	}()
 	client := models.GeminiModel()

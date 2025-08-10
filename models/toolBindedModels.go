@@ -54,7 +54,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.5-pro",
+		"gemini-2.5-flash",
 		prompt,
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
@@ -67,9 +67,11 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		},
 	)
 	if err != nil {
-		log.Fatal(err)
+		conn.WriteJSON(utils.Response{Text: "Error: Token Limit Reached"})
+		log.Println(err)
+		return "Error: Token Limit Reached"
 	}
-	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
+	if len(result.Candidates) == 0 || result.Candidates[0].Content == nil || len(result.Candidates[0].Content.Parts) == 0 {
 		res, _ := json.Marshal(result)
 		log.Println(string(res))
 		for i := range prompt {
@@ -95,11 +97,12 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		var data Agent
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
-		conn.WriteJSON(utils.Response{Text: "Searching withs tools"})
+		conn.WriteJSON(utils.Response{Text: "Searching with tools"})
 		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text, conn)
 		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		return sus
 	} else {
+		conn.WriteJSON(utils.Response{Text: "Error: processing request"})
 		log.Println("Error processing request: No text or function call")
 		return "Error processing request"
 	}
