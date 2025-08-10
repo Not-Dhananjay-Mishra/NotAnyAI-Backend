@@ -84,14 +84,18 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 	part := result.Candidates[0].Content.Parts[0]
 
 	if part.Text != "" {
-		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(part.Text, genai.RoleModel))
+		//utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(part.Text, genai.RoleModel))
 		ans := ""
 		for i := range result.Candidates[0].Content.Parts {
 			//res, _ := json.Marshal(result.Candidates[0].Content.Parts[i].Text)
 			ans += result.Candidates[0].Content.Parts[i].Text
 		}
-		fmt.Println(utils.Yellow("AI : "), ans)
-		return ans
+		var temp []*genai.Content
+		temp = append(temp, genai.NewContentFromText(prompt[len(prompt)-1].Parts[0].Text, genai.RoleUser))
+		temp = append(temp, genai.NewContentFromText(ans, genai.RoleUser))
+		sus := StreamPostProcessing(c, username, temp, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
+		fmt.Println(utils.Yellow("AI : "), sus)
+		return sus
 	} else if part.FunctionCall.Name != "" {
 		res, _ := json.Marshal(part.FunctionCall.Args)
 		var data Agent
@@ -99,7 +103,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		fmt.Println(utils.Cyan(string(res)))
 		conn.WriteJSON(utils.Response{Text: "Searching with tools"})
 		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text, conn)
-		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
+		sus := StreamPostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		return sus
 	} else {
 		conn.WriteJSON(utils.Response{Text: "Error: processing request"})
