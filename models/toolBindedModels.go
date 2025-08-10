@@ -39,7 +39,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
 	result, err := c.Models.GenerateContent(
 		ctx,
-		"gemini-2.5-flash",
+		"gemini-2.5-pro",
 		prompt,
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{

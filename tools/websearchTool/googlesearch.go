@@ -77,7 +77,7 @@ func AIGoogleSearch(query string) string {
 	}
 	r, err := client.Models.GenerateContent(
 		ctx,
-		"gemini-2.5-flash",
+		"gemini-2.5-pro",
 		genai.Text(query),
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
