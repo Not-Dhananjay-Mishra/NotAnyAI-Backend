@@ -38,11 +38,12 @@ func PostProcessing(c *genai.Client, username string, content []*genai.Content, 
 	}
 	tkn, _ := json.Marshal(result.UsageMetadata.TotalTokenCount)
 	fmt.Println("Total Token used: ", string(tkn))
-	if result.Candidates[0].Content.Parts[0].Text != "" {
-		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].Text)
-		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(string(res), genai.RoleModel))
-		fmt.Println(utils.Yellow("AI : "), string(res))
-		return string(res)
+	part := result.Candidates[0].Content.Parts[0]
+
+	if part.Text != "" {
+		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(part.Text, genai.RoleModel))
+		fmt.Println(utils.Yellow("AI : "), part.Text)
+		return part.Text
 	} else {
 		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
 		var data Agent

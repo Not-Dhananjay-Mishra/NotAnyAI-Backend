@@ -36,6 +36,20 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 		log.Println("Prompt or parts is empty")
 		return "Invalid prompt"
 	}
+	sus := `
+						You are a helpful AI assistant.
+						Your primary goal is to give the user the most complete and accurate answer possible.
+
+						Rules:
+						1. If you can answer directly with your own knowledge, do so without calling tools.
+						2. Only call tools when the answer requires external, real-time, or highly specific information.
+						3. When giving code, return the **entire working code block** in the requested language without extra setup steps unless explicitly asked.
+						4. Maintain proper formatting and preserve line breaks in code.
+						5. You may ask clarifying questions if the prompt is ambiguous.
+						6. Always ensure the final output is ready for the user to copy and use immediately.
+						7. if using only llm give full response
+						Follow these rules strictly.
+			`
 	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
 	result, err := c.Models.GenerateContent(
 		ctx,
@@ -48,7 +62,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 						&tools.ToolDeciderAgent},
 				},
 			},
-			SystemInstruction: &genai.Content{Parts: []*genai.Part{{Text: "You are a helpful assistant. You can answer questions normally or use tools if required. u can ask for follow up"}}},
+			SystemInstruction: &genai.Content{Parts: []*genai.Part{{Text: sus}}},
 		},
 	)
 	if err != nil {
@@ -67,10 +81,14 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 	part := result.Candidates[0].Content.Parts[0]
 
 	if part.Text != "" {
-		res, _ := json.Marshal(part.Text)
-		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(string(res), genai.RoleModel))
-		fmt.Println(utils.Yellow("AI : "), string(res))
-		return string(res)
+		utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(part.Text, genai.RoleModel))
+		ans := ""
+		for i := range result.Candidates[0].Content.Parts {
+			//res, _ := json.Marshal(result.Candidates[0].Content.Parts[i].Text)
+			ans += result.Candidates[0].Content.Parts[i].Text
+		}
+		fmt.Println(utils.Yellow("AI : "), ans)
+		return ans
 	} else if part.FunctionCall.Name != "" {
 		res, _ := json.Marshal(part.FunctionCall.Args)
 		var data Agent
