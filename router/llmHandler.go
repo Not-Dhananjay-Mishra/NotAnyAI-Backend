@@ -12,9 +12,6 @@ type recived struct {
 	Agent string `json:"agent"`
 	Query string `json:"query"`
 }
-type response struct {
-	Text string `json:"text"`
-}
 
 func HandleConn(conn *websocket.Conn, username string) {
 	defer func() {
@@ -40,8 +37,8 @@ func HandleConn(conn *websocket.Conn, username string) {
 
 			prompt := receivedData.Query
 			models.AddToMemoryUSER(username, prompt)
-			aires := models.ModelWithTools(client, utils.MemoryStore[username], username)
-			conn.WriteJSON(response{Text: aires})
+			aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
+			conn.WriteJSON(utils.Response{Text: aires})
 		}
 	}
 

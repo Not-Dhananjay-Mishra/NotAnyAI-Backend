@@ -8,6 +8,7 @@ import (
 	"server/tools"
 	"server/utils"
 
+	"github.com/gorilla/websocket"
 	"google.golang.org/genai"
 )
 
@@ -30,7 +31,7 @@ type Agent struct {
 	GithubSearchTool        FunctionArgs `json:"github_searchtool"`
 }
 
-func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) string {
+func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, conn *websocket.Conn) string {
 	ctx := context.Background()
 	if len(prompt) == 0 || len(prompt[len(prompt)-1].Parts) == 0 {
 		log.Println("Prompt or parts is empty")
@@ -94,8 +95,9 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string) s
 		var data Agent
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
-		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text)
-		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt)
+		conn.WriteJSON(utils.Response{Text: "Searching withs tools"})
+		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text, conn)
+		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		return sus
 	} else {
 		log.Println("Error processing request: No text or function call")

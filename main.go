@@ -41,10 +41,10 @@ func main() {
 	blocker := make(chan any)
 	go router.RouterHandler()
 
-	log.Println(utils.Green("Websocket Server Started on localhost:8000/wss/contact"))
-	log.Println(utils.Green("REST API Server Started on localhost:8000/login"))
-	log.Println(utils.Green("REST API Server Started on localhost:8000/register"))
-	log.Println(utils.Green("REST API Server Started on localhost:8000/validate"))
+	log.Println(utils.Green("Websocket Server Started on :8000/wss/contact"))
+	log.Println(utils.Green("REST API Server Started on :8000/login"))
+	log.Println(utils.Green("REST API Server Started on :8000/register"))
+	log.Println(utils.Green("REST API Server Started on :8000/validate"))
 
 	<-blocker
 }

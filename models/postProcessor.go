@@ -8,11 +8,13 @@ import (
 	"server/tools"
 	"server/utils"
 
+	"github.com/gorilla/websocket"
 	"google.golang.org/genai"
 )
 
-func PostProcessing(c *genai.Client, username string, content []*genai.Content, lastquery string, prompt []*genai.Content) string {
+func PostProcessing(c *genai.Client, username string, content []*genai.Content, lastquery string, prompt []*genai.Content, conn *websocket.Conn) string {
 	ctx := context.Background()
+	conn.WriteJSON(utils.Response{Text: "Processing request..."})
 	sus := `You have received responses from multiple function calls related to the user’s query. Your task is to:
 	- Combine and process these responses to generate a clear, concise, and relevant final answer for the user with all infomation needed.
 	- Only and only request additional information or call other tools if the current responses are insufficient to fully answer the query avoid if u can dont call same tool with same query again.
@@ -49,8 +51,8 @@ func PostProcessing(c *genai.Client, username string, content []*genai.Content, 
 		var data Agent
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
-		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text)
-		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt)
+		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text, conn)
+		sus := PostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		return sus
 	}
 }

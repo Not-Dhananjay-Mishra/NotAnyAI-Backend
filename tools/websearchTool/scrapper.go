@@ -80,7 +80,7 @@ func AIScrapper(c *genai.Client, url1 string) string {
 		&genai.GenerateContentConfig{
 			Tools: []*genai.Tool{
 				{
-					//URLContext:   &genai.URLContext{},
+					URLContext:   &genai.URLContext{},
 					GoogleSearch: &genai.GoogleSearch{},
 				},
 			},

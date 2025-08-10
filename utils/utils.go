@@ -69,3 +69,7 @@ type EmbeddingPayload struct {
 var LiveConn = make(map[*websocket.Conn]bool)
 var ConnUser = make(map[*websocket.Conn]string)
 var UserConn = make(map[string]*websocket.Conn)
+
+type Response struct {
+	Text string `json:"text"`
+}

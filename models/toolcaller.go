@@ -8,6 +8,7 @@ import (
 	"server/utils"
 	"sync"
 
+	"github.com/gorilla/websocket"
 	"google.golang.org/genai"
 )
 
@@ -17,7 +18,7 @@ type allFunctionResponse struct {
 	Response     any
 }
 
-func ToolCaller(data Agent, lastquery string) []*genai.Content {
+func ToolCaller(data Agent, lastquery string, conn *websocket.Conn) []*genai.Content {
 	var mu sync.Mutex
 	var FunctionContent []*genai.Content
 	var functiondata []allFunctionResponse
@@ -26,6 +27,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	var wg sync.WaitGroup
 
 	if data.AIGoogleSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Web"})
 		for _, query := range data.AIGoogleSearchTool.Query {
 			wg.Add(1)
 			go func(q string) {
@@ -40,6 +42,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.DeepWikipediaSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Wikipedia"})
 		for _, query := range data.DeepWikipediaSearchTool.Query {
 
 			wg.Add(1)
@@ -55,6 +58,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.GithubSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Github"})
 		for _, query := range data.GithubSearchTool.Query {
 
 			wg.Add(1)
@@ -74,6 +78,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.GoogleSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Web"})
 		for _, query := range data.GoogleSearchTool.Query {
 			wg.Add(1)
 			go func(q string) {
@@ -92,6 +97,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.NewsSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching for News"})
 		for _, query := range data.NewsSearchTool.Query {
 
 			wg.Add(1)
@@ -112,6 +118,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.RedditSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Reddit"})
 		for _, query := range data.RedditSearchTool.Query {
 			wg.Add(1)
 			go func(q string) {
@@ -123,6 +130,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.StackoverflowSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Stackoverflow"})
 		for _, query := range data.StackoverflowSearchTool.Query {
 			wg.Add(1)
 			go func(q string) {
@@ -133,6 +141,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.WeatherTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Fetching current weather"})
 		for _, query := range data.WeatherTool.Query {
 
 			wg.Add(1)
@@ -148,6 +157,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.WikipediaSearchTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Wikipedia"})
 		for _, query := range data.WikipediaSearchTool.Query {
 
 			wg.Add(1)
@@ -163,6 +173,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.YoutubePlaylistTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Youtube"})
 		for _, query := range data.YoutubePlaylistTool.Query {
 
 			wg.Add(1)
@@ -182,6 +193,7 @@ func ToolCaller(data Agent, lastquery string) []*genai.Content {
 	}
 
 	if data.YoutubeVideoTool.UseTool {
+		conn.WriteJSON(utils.Response{Text: "Searching on Youtube"})
 		for _, query := range data.YoutubeVideoTool.Query {
 
 			wg.Add(1)
