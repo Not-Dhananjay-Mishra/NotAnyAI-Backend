@@ -90,10 +90,10 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 			//res, _ := json.Marshal(result.Candidates[0].Content.Parts[i].Text)
 			ans += result.Candidates[0].Content.Parts[i].Text
 		}
-		var temp []*genai.Content
-		temp = append(temp, genai.NewContentFromText(prompt[len(prompt)-1].Parts[0].Text, genai.RoleUser))
+		//var temp []*genai.Content
+		//temp = append(temp, genai.NewContentFromText(prompt[len(prompt)-1].Parts[0].Text, genai.RoleUser))
 		//temp = append(temp, genai.NewContentFromText(ans, genai.RoleUser))
-		sus := StreamPostProcessing(c, username, temp, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
+		sus := StreamPostProcessing(c, username, prompt, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
 		fmt.Println(utils.Yellow("AI : "), sus)
 		return sus
 	} else if part.FunctionCall.Name != "" {
