@@ -13,7 +13,7 @@ import (
 )
 
 func ImageModel(client *genai.Client, path string, prompt string, imgFormat string, conn *websocket.Conn, username string, imgbyte []byte) string {
-	conn.WriteJSON(utils.Response{Text: "Thinking..."})
+	conn.WriteJSON(utils.Response{Text: "Thinking...."})
 	/*bytes, err := os.ReadFile(path)
 	if err != nil {
 		bytes = imgbyte
@@ -21,6 +21,7 @@ func ImageModel(client *genai.Client, path string, prompt string, imgFormat stri
 	bytes := imgbyte
 	ctx := context.Background()
 	imgtype := "image/" + imgFormat
+
 	sus := `
 						You are a helpful AI assistant.
 						Your primary goal is to give the user the most complete and accurate answer possible.
@@ -60,7 +61,8 @@ func ImageModel(client *genai.Client, path string, prompt string, imgFormat stri
 		},
 	)
 	finalans := ""
-
+	//res, _ := json.Marshal(result)
+	//fmt.Println(utils.Red(string(res)))
 	if result.Candidates[0].Content.Parts[0].Text != "" {
 		//fmt.Println(result.Candidates[0].Content.Parts[0].Text)
 		finalans = result.Candidates[0].Content.Parts[0].Text
