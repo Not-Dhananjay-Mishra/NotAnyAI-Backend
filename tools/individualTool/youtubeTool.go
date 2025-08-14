@@ -115,6 +115,7 @@ func YoutubeToolVideo(query string) []utils.VideoDetails {
 	return Videos
 }
 func YoutubeToolPlaylist(query string) ([]string, []string, []string) {
+	//fmt.Println("YT1")
 	var Links []string
 	var Titles []string
 	var Descriptions []string
@@ -135,13 +136,14 @@ func YoutubeToolPlaylist(query string) ([]string, []string, []string) {
 		log.Printf("Error reading response body: %v", err)
 		return nil, nil, nil
 	}
+	//fmt.Println("Links", string(bodyBytes))
 
 	var youtubeResponse PYouTubeResponse
 	if err := json.Unmarshal(bodyBytes, &youtubeResponse); err != nil {
 		log.Printf("Error unmarshaling JSON: %v", err)
 		return nil, nil, nil
 	}
-
+	//fmt.Println("YT2")
 	for _, item := range youtubeResponse.Items {
 		if item.ID.Kind == "youtube#playlist" {
 			playlistURL := fmt.Sprintf("https://www.youtube.com/playlist?list=%s", item.ID.PlaylistID)
@@ -151,6 +153,7 @@ func YoutubeToolPlaylist(query string) ([]string, []string, []string) {
 			Descriptions = append(Descriptions, desc)
 		}
 	}
+
 	return Links, Titles, Descriptions
 
 }

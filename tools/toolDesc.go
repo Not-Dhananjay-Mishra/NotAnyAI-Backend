@@ -361,3 +361,109 @@ var ToolDeciderAgent = genai.FunctionDeclaration{
 		//Required: []string{"reddit_searchtool"},
 	},
 }
+
+// temp new try
+var NewToolDeciderAgent = genai.FunctionDeclaration{
+	Name:        "agent",
+	Description: "Select all relevant tools for the user query. Each tool has a 'usetool' boolean and a 'query' array of independent, context-rich search queries extracted from user intent.",
+	Parameters: &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"wikipediatool": {
+				Type:        genai.TypeObject,
+				Description: "Search basic Wikipedia.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if Wikipedia search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"deepwikipediatool": {
+				Type:        genai.TypeObject,
+				Description: "Search deep/related Wikipedia pages.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if deep Wikipedia search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"news_searchtool": {
+				Type:        genai.TypeObject,
+				Description: "Search for recent news articles.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if news search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"github_searchtool": {
+				Type:        genai.TypeObject,
+				Description: "Search GitHub repositories or code.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if GitHub search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"stackoverflow_searchtool": {
+				Type:        genai.TypeObject,
+				Description: "Search programming questions on Stack Overflow.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if Stack Overflow search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"google_search_aitool": {
+				Type:        genai.TypeObject,
+				Description: "AI-enhanced Google search for better page summaries.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if AI-powered Google search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"google_searchtool": {
+				Type:        genai.TypeObject,
+				Description: "Standard Google search.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if Google search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"youtube_playlisttool": {
+				Type:        genai.TypeObject,
+				Description: "Search YouTube playlists.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if YouTube playlist search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"youtube_videotool": {
+				Type:        genai.TypeObject,
+				Description: "Search YouTube videos.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if YouTube video search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+			"weathertool": {
+				Type:        genai.TypeObject,
+				Description: "Get current weather for places.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if weather data is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Array of place names only."},
+				},
+			},
+			"reddit_searchtool": {
+				Type:        genai.TypeObject,
+				Description: "Search Reddit for discussions.",
+				Properties: map[string]*genai.Schema{
+					"usetool": {Type: genai.TypeBoolean, Description: "True if Reddit search is needed."},
+					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "Independent search queries."},
+				},
+			},
+		},
+		Required: []string{
+			"wikipediatool", "deepwikipediatool", "news_searchtool",
+			"github_searchtool", "stackoverflow_searchtool",
+			"google_search_aitool", "google_searchtool",
+			"youtube_playlisttool", "youtube_videotool",
+			"weathertool", "reddit_searchtool",
+		},
+	},
+}

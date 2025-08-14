@@ -51,7 +51,11 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 						7. if using only llm give full response
 						Follow these rules strictly.
 			`
-	fmt.Println(utils.Magenta("Prompt: "), prompt[len(prompt)-1].Parts[0].Text)
+	p := prompt[len(prompt)-1].Parts[0].Text
+	if prompt[len(prompt)-1].Parts[0].Text == "" {
+		p = prompt[len(prompt)-1].Parts[1].Text
+	}
+	fmt.Println(utils.Magenta("Prompt: "), p)
 	result, err := c.Models.GenerateContent(
 		ctx,
 		"gemini-2.5-flash",
@@ -93,8 +97,8 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		//var temp []*genai.Content
 		//temp = append(temp, genai.NewContentFromText(prompt[len(prompt)-1].Parts[0].Text, genai.RoleUser))
 		//temp = append(temp, genai.NewContentFromText(ans, genai.RoleUser))
-		sus := StreamPostProcessing(c, username, prompt, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
-		fmt.Println(utils.Yellow("AI : "), sus)
+		sus := StreamPostProcessing(c, username, prompt, p, prompt, conn)
+		//fmt.Println(utils.Yellow("AI : "), sus)
 		return sus
 	} else if part.FunctionCall.Name != "" {
 		res, _ := json.Marshal(part.FunctionCall.Args)
@@ -102,8 +106,8 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
 		conn.WriteJSON(utils.Response{Text: "Searching with tools"})
-		content := ToolCaller(data, prompt[len(prompt)-1].Parts[0].Text, conn)
-		sus := StreamPostProcessing(c, username, content, prompt[len(prompt)-1].Parts[0].Text, prompt, conn)
+		content := ToolCaller(data, p, conn)
+		sus := StreamPostProcessing(c, username, content, p, prompt, conn)
 		return sus
 	} else {
 		conn.WriteJSON(utils.Response{Text: "Error: processing request"})

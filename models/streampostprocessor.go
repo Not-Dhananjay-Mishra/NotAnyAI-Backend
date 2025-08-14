@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"server/utils"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func StreamPostProcessing(c *genai.Client, username string, content []*genai.Content, lastquery string, prompt []*genai.Content, conn *websocket.Conn) string {
-	log.Println("Reached SPP")
+	log.Println("Reached SPP ")
 	ctx := context.Background()
 	conn.WriteJSON(utils.Response{Text: "Processing request..."})
 	sus := `You have received responses from multiple function calls related to the user’s query or direct query from user. Your task is to:
@@ -21,7 +20,7 @@ func StreamPostProcessing(c *genai.Client, username string, content []*genai.Con
 	- Present the final output in a user-friendly and informative way.
 	- If you recive direct query answer directly with your own knowledge, do so without calling tools.`
 	//content = append(content, genai.NewContentFromText(lastquery, genai.RoleUser))
-	fmt.Println(content)
+	//log.Println(content[len(content)-1].Parts[0].Text)
 	result := c.Models.GenerateContentStream(
 		ctx,
 		"gemini-2.5-flash",
@@ -52,5 +51,6 @@ func StreamPostProcessing(c *genai.Client, username string, content []*genai.Con
 		}
 	}
 	utils.MemoryStore[username] = append(utils.MemoryStore[username], genai.NewContentFromText(finalans, genai.RoleModel))
+	log.Println("Done SPP ")
 	return finalans
 }
