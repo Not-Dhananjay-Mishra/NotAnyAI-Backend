@@ -48,7 +48,7 @@ func HandleConn(conn *websocket.Conn, username string) {
 			}
 			userPrompt := data.Query
 			log.Println(utils.Green("Image received and saved as", fileName))
-			models.AddImgToMemoryUSER(username, userPrompt, fileName)
+			models.AddImgToMemoryUSER(username, userPrompt, fileName, imgBytes)
 			//fmt.Println(utils.MemoryStore[username])
 			conn.WriteJSON(utils.Response{Text: "Image received successfully"})
 			//models.PrintMemobyUsername(username)

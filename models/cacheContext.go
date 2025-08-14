@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"server/utils"
 
 	"google.golang.org/genai"
@@ -40,8 +39,8 @@ func AddToMemoryUSER(username string, prompt string) {
 		utils.MemoryStore[username] = utils.MemoryStore[username][1:]
 	}
 }
-func AddImgToMemoryUSER(username string, prompt string, path string) {
-	bytes, _ := os.ReadFile(path)
+func AddImgToMemoryUSER(username string, prompt string, path string, img []byte) {
+	bytes := img
 	parts := []*genai.Part{
 		genai.NewPartFromBytes(bytes, "image/png"),
 		genai.NewPartFromText(prompt),
