@@ -13,9 +13,12 @@ import (
 	"google.golang.org/genai"
 )
 
-func ImageModel(client *genai.Client, path string, prompt string, imgFormat string, conn *websocket.Conn, username string) string {
+func ImageModel(client *genai.Client, path string, prompt string, imgFormat string, conn *websocket.Conn, username string, imgbyte []byte) string {
 	conn.WriteJSON(utils.Response{Text: "Thinking..."})
-	bytes, _ := os.ReadFile(path)
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		bytes = imgbyte
+	}
 	ctx := context.Background()
 	imgtype := "image/" + imgFormat
 	sus := `

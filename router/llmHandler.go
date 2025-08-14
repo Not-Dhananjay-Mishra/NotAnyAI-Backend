@@ -53,7 +53,7 @@ func HandleConn(conn *websocket.Conn, username string) {
 			//fmt.Println(utils.MemoryStore[username])
 			conn.WriteJSON(utils.Response{Text: "Image received successfully"})
 			//models.PrintMemobyUsername(username)
-			aires := models.ImageModel(client, fileName, userPrompt, "jpeg", conn, username)
+			aires := models.ImageModel(client, fileName, userPrompt, "jpeg", conn, username, imgBytes)
 			//aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
 			conn.WriteJSON(utils.Response{Text: aires})
 			continue
