@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"server/tools"
 	"server/utils"
 
@@ -15,10 +14,11 @@ import (
 
 func ImageModel(client *genai.Client, path string, prompt string, imgFormat string, conn *websocket.Conn, username string, imgbyte []byte) string {
 	conn.WriteJSON(utils.Response{Text: "Thinking..."})
-	bytes, err := os.ReadFile(path)
+	/*bytes, err := os.ReadFile(path)
 	if err != nil {
 		bytes = imgbyte
-	}
+	}*/
+	bytes := imgbyte
 	ctx := context.Background()
 	imgtype := "image/" + imgFormat
 	sus := `

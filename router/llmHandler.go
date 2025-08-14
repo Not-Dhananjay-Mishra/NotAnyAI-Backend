@@ -45,7 +45,6 @@ func HandleConn(conn *websocket.Conn, username string) {
 			err = os.WriteFile(fileName, imgBytes, 0644)
 			if err != nil {
 				log.Println("File write error:", err)
-				continue
 			}
 			userPrompt := data.Query
 			log.Println(utils.Green("Image received and saved as", fileName))
