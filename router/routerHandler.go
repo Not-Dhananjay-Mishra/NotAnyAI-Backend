@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -59,13 +60,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	HandleConn(conn, username)
 }
-
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "up"})
+}
 func RouterHandler() {
 	router := mux.NewRouter()
 	router.HandleFunc("/wss/chat", handler)
 	router.HandleFunc("/login", auth.Login).Methods("POST")
 	router.HandleFunc("/register", auth.Register).Methods("POST")
 	router.HandleFunc("/validate", auth.GateKeeper).Methods("GET")
+	router.HandleFunc("/pingpong", ping).Methods("GET")
 
 	corsWrappedRouter := corsMiddleware(router)
 
