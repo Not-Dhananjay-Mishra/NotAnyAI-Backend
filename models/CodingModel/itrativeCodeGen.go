@@ -58,7 +58,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	1. The code must be self-contained, production-ready, and follow React best practices.
 	2. The component must be a functional component and the returned JSX must be wrapped in a single parent element.
 	3. Use only React and Tailwind CSS (via className strings).
-	4. Do not use any external libraries.
+	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom, etc.).
 	5. All JSX array elements must be separated by commas.
 	6. Do not output explanations, comments, or extra text.
 	7. Do not use contractions like "don't" or "that's etc that has - ' in it".
