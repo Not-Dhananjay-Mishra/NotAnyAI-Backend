@@ -78,7 +78,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	3. Use only React, react-dom and Tailwind CSS (via className strings).
 	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom (alternative of this can be used - react-dom), etc.).
 	5. All JSX array elements must be separated by commas.
-	6. Do not output explanations, comments, or extra text.
+	6. Do not output explanations, comments, extra text, backslashes (\), or forward slashes (/) unless absolutely required inside valid JSX or string literals.
 	7. Do not use contractions like "don't" or "that's etc that has : ' in it".
 	8. Only return the code content for "%s".
 	`, allFiles, targetFile, targetFile)
