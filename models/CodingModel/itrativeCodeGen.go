@@ -19,6 +19,7 @@ type GenteratedCode struct {
 }
 
 func Itrative(data []string, prompt string, c *genai.Client, conn *websocket.Conn) map[string]string {
+	// with go rountines
 	var wg sync.WaitGroup
 	mu := sync.Mutex{}
 	results := make(map[string]string)
@@ -43,6 +44,23 @@ func Itrative(data []string, prompt string, c *genai.Client, conn *websocket.Con
 	return results
 }
 
+func ItrativeWithoutGo(data []string, prompt string, c *genai.Client, conn *websocket.Conn) map[string]string {
+	// without go rountines
+	results := make(map[string]string)
+	totaltkn := 0
+
+	for _, file := range data {
+		conn.WriteJSON(utils.Response{Text: "⚙️ Started generation of " + file})
+		code, tkn := CodeGen(prompt, file, data)
+		conn.WriteJSON(utils.Response{Text: "✅ Completed generation of " + file})
+		results[file] = code
+		totaltkn += int(tkn)
+		time.Sleep(time.Second * 2)
+	}
+	fmt.Println(utils.Red("Code Gen Token - ", totaltkn))
+	return results
+}
+
 func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32) {
 	//fmt.Println(targetFile)
 	//fmt.Println(prompt)
@@ -57,8 +75,8 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	### Rules:
 	1. The code must be self-contained, production-ready, and follow React best practices.
 	2. The component must be a functional component and the returned JSX must be wrapped in a single parent element.
-	3. Use only React, react-dom 18.2.0 and Tailwind CSS (via className strings).
-	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom, etc.).
+	3. Use only React, react-dom and Tailwind CSS (via className strings).
+	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom (alternative of this can be used - react-dom), etc.).
 	5. All JSX array elements must be separated by commas.
 	6. Do not output explanations, comments, or extra text.
 	7. Do not use contractions like "don't" or "that's etc that has : ' in it".
