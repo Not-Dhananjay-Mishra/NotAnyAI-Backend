@@ -29,9 +29,11 @@ func Itrative(data []string, prompt string, c *genai.Client, conn *websocket.Con
 		wg.Add(1)
 		go func(fname string) {
 			defer wg.Done()
-			conn.WriteJSON(utils.Response{Text: "⚙️ Started generation of " + file})
+			//conn.WriteJSON(utils.Response{Text: "⚙️ Started generation of " + file})
+			conn.WriteJSON(map[string]string{"codegenstart": "⚙️ Started generation of " + file})
 			code, tkn := CodeGen(prompt, fname, data)
-			conn.WriteJSON(utils.Response{Text: "✅ Completed generation of " + file})
+			//conn.WriteJSON(utils.Response{Text: "✅ Completed generation of " + file})
+			conn.WriteJSON(map[string]string{"codegencomplete": "✅ Completed generation of " + file})
 			mu.Lock()
 			results[fname] = code
 			totaltkn += int(tkn)

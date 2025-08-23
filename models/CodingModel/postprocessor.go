@@ -55,7 +55,8 @@ func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
 }
 
 func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn) map[string]string {
-	conn.WriteJSON(utils.Response{Text: "⏳ Final processing, this may take a few minutes..."})
+	//conn.WriteJSON(utils.Response{Text: "⏳ Final processing, this may take a few minutes..."})
+	conn.WriteJSON(map[string]string{"processing": "⏳ Final processing, this may take a few minutes..."})
 	c := models.GeminiModel()
 	ctx := context.Background()
 	config := &genai.GenerateContentConfig{
@@ -81,6 +82,7 @@ func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn) map[str
 	json.Unmarshal(res, &response)
 	tkn := result.UsageMetadata.TotalTokenCount
 	fmt.Println(utils.Red("Post Token - ", tkn))
-	conn.WriteJSON(utils.Response{Text: "🎉 Done!"})
+	//conn.WriteJSON(utils.Response{Text: "🎉 Done!"})
+	conn.WriteJSON(map[string]string{"processing": "🎉 Done!"})
 	return response.Components
 }
