@@ -36,7 +36,7 @@ func init() {
 }
 
 func GetUserPassword(username string) (string, error) {
-	if username == "techdm" {
+	if username == "techdm" || username == "Gaurav" {
 		return "1234", nil
 	}
 	var result Data
