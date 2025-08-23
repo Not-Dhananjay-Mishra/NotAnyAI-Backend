@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"server/models"
+	codingmodel "server/models/CodingModel"
 	"server/utils"
 
 	"github.com/google/uuid"
@@ -38,6 +39,7 @@ func HandleConn(conn *websocket.Conn, username string) {
 		}
 		if data.Agent == "normal" {
 			log.Println(utils.Green("Json"))
+
 		} else if data.Img != "" {
 			imgBytes, _ := base64.StdEncoding.DecodeString(data.Img)
 			sus := uuid.New().String()
@@ -55,6 +57,13 @@ func HandleConn(conn *websocket.Conn, username string) {
 			aires := models.ImageModel(client, fileName, userPrompt, "png", conn, username, imgBytes)
 			//aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
 			conn.WriteJSON(utils.Response{Text: aires})
+			continue
+
+		} else if data.Agent == "code" {
+			replyCh := make(chan map[string]string, 1)
+			codingmodel.UnderProcessCode <- codingmodel.Process{Data: codingmodel.Sus{Query: data.Query}, ReplyCh: replyCh, Conn: conn}
+			result := <-replyCh
+			conn.WriteJSON(result)
 			continue
 		}
 

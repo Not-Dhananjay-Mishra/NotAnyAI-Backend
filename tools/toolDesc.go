@@ -467,3 +467,50 @@ var NewToolDeciderAgent = genai.FunctionDeclaration{
 		},
 	},
 }
+
+var JSXTool = genai.FunctionDeclaration{
+	Name:        "jx",
+	Description: "Generates and returns valid React javascript (JSX) component code. The code must be self-contained, properly typed, and not include explanations or extra text.",
+	Parameters: &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"code": {
+				Type:        genai.TypeString,
+				Description: "A complete, valid React component written in javascript (JSX). Must be ready to compile without additional modifications. only the App file must be .js",
+			},
+		},
+		Required: []string{"code"},
+	},
+}
+
+var FilenameTool = genai.FunctionDeclaration{
+	Name:        "file",
+	Description: "Generates the necessary React .jsx file names for a given frontend design prompt. Each returned file name should be valid, descriptive, and suitable for use in a React project.",
+	Parameters: &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"file": {
+				Type:        genai.TypeArray,
+				Description: "A complete, valid React component written in javascript (JSX). Must be ready to compile without additional modifications.",
+				Items:       &genai.Schema{Type: genai.TypeString},
+			},
+		},
+		Required: []string{"file"},
+	},
+}
+
+var PostCode = genai.FunctionDeclaration{
+	Name:        "files",
+	Description: "Fixes the given React code and returns every React component as a map. The map keys are filenames: use 'App.js' (only App keeps .js) and use '.jsx' for all other components. Each value must be the complete, valid React component code with correct Tailwind classes.",
+	Parameters: &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"components": {
+				Type:        genai.TypeObject,
+				Description: "A map where keys are React component filenames (App.js or other .jsx files) and values are their fixed, valid component code.",
+				// No Properties field → Gemini can freely return any keys
+			},
+		},
+		Required: []string{"components"},
+	},
+}

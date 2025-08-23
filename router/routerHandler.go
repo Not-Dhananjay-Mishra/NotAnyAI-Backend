@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"server/auth"
+	codingmodel "server/models/CodingModel"
 	"server/utils"
 
 	"github.com/gorilla/mux"
@@ -72,6 +73,7 @@ func RouterHandler() {
 	router.HandleFunc("/register", auth.Register).Methods("POST")
 	router.HandleFunc("/validate", auth.GateKeeper).Methods("GET")
 	router.HandleFunc("/pingpong", ping).Methods("GET")
+	router.HandleFunc("/api/code", codingmodel.GetRequest).Methods("POST")
 
 	corsWrappedRouter := corsMiddleware(router)
 
