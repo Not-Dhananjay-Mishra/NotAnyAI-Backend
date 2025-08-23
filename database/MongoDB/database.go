@@ -37,7 +37,7 @@ func init() {
 
 func GetUserPassword(username string) (string, error) {
 	if username == "techdm" || username == "Gaurav" {
-		return "1234", nil
+		return "2024", nil
 	}
 	var result Data
 	filter := bson.M{"username": username}
