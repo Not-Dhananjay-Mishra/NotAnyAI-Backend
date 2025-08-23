@@ -26,7 +26,7 @@ func init() {
 	UnderProcessCode = make(chan Process, 50)
 }
 
-const sysprompt = "You are a frontend code assistant. For any given prompt, determine only the necessary React .jsx file names the App file must be .js App.js and if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, explanations, or extra text—only return valid file names via the provided tool. keep count of file min"
+const sysprompt = "You are a frontend code assistant. For any given prompt, determine only the necessary React .jsx file names the App file must be .js App.js and if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, explanations, or extra text—only return valid file names via the provided tool. The count of files should be kept to the absolute minimum required to fulfill the user's request."
 
 type Sus struct {
 	Query string `json:"query"`
