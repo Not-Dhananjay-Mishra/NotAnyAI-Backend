@@ -36,7 +36,7 @@ func Itrative(data []string, prompt string, c *genai.Client, conn *websocket.Con
 			totaltkn += int(tkn)
 			mu.Unlock()
 		}(file)
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 8)
 	}
 	wg.Wait()
 	fmt.Println(utils.Red("Code Gen Token - ", totaltkn))
@@ -61,7 +61,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom, etc.).
 	5. All JSX array elements must be separated by commas.
 	6. Do not output explanations, comments, or extra text.
-	7. Do not use contractions like "don't" or "that's etc that has - ' in it".
+	7. Do not use contractions like "don't" or "that's etc that has : ' in it".
 	8. Only return the code content for "%s".
 	`, allFiles, targetFile, targetFile)
 
@@ -79,6 +79,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	)
 	if err != nil {
 		fmt.Println(utils.Red("TOKEN KATAM HOGAYE!!"))
+
 		fmt.Println(err)
 		return "", 0
 	}
