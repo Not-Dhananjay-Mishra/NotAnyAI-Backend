@@ -16,6 +16,9 @@ var GITHUB_API string
 var STACKOVERFLOW_API string
 var WEATHER_API string
 var GOOGLE_SEARCH_CX string
+var QDRANT_URL string
+var QDRANT_API string
+var PEXELS_API_KEY string
 
 var Yellow = color.New(color.FgYellow).SprintFunc()
 var Red = color.New(color.FgRed).SprintFunc()
@@ -72,4 +75,8 @@ var UserConn = make(map[string]*websocket.Conn)
 
 type Response struct {
 	Text string `json:"text"`
+}
+
+func ToPtr[T any](v T) *T {
+	return &v
 }

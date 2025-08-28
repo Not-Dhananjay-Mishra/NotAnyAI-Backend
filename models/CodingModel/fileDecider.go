@@ -26,7 +26,12 @@ func init() {
 	UnderProcessCode = make(chan Process, 50)
 }
 
-const sysprompt = "You are a frontend code assistant. For any given prompt, determine only the necessary React .jsx file names the App file must be .js App.js and if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, explanations, or extra text—only return valid file names via the provided tool. The count of files should be kept to the absolute minimum required to fulfill the user's request."
+const sysprompt = `You are a frontend code assistant. For any given prompt, 
+	determine only the necessary React .jsx file names the App file must be .js App.js and 
+	if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, 
+	explanations, or extra text—only return valid file names via the provided tool.
+	The count of files should be kept to the absolute minimum required to fulfill the user's request.
+	`
 
 type Sus struct {
 	Query string `json:"query"`
@@ -78,9 +83,14 @@ func FileDecider(data Sus, conn *websocket.Conn) map[string]string {
 	var suseee GenAIResponse
 	json.Unmarshal(res, &suseee)
 	fmt.Println(suseee.Filename)
+
+	//sending statis to conn
 	sendres(suseee.Filename, conn)
+
+	//itrative generating code
 	time.Sleep(time.Second * 2)
-	suse := Itrative(suseee.Filename, data.Query, c, conn)
+	suse := ItrativeWithoutGo(suseee.Filename, data.Query, c, conn)
+
 	//fmt.Println(sus)
 	content := MapToContent(suse, conn)
 	sus := CodingPostProcessor(content, conn)

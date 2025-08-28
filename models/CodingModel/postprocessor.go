@@ -40,6 +40,8 @@ Your task is to fix the given React code and return every React component in a J
 
 7. Do not wrap the code in triple backticks.
 8. Do not include extra text outside the JSON object.
+9. give response in tools only no plain text
+10. main task u have to keep in mind website must look modern and cool and all tailwind class vibe with each other no two class colour very differently that doesnt make sense so make time vibing with each other
 `
 
 func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {

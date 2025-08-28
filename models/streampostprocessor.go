@@ -10,7 +10,7 @@ import (
 )
 
 func StreamPostProcessing(c *genai.Client, username string, content []*genai.Content, lastquery string, prompt []*genai.Content, conn *websocket.Conn) string {
-	log.Println("Reached SPP ")
+	//log.Println("Reached SPP ")
 	ctx := context.Background()
 	conn.WriteJSON(utils.Response{Text: "Processing request..."})
 	sus := `You have received responses from multiple function calls related to the user’s query or direct query from user. Your task is to:

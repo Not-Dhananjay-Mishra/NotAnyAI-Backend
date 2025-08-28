@@ -29,17 +29,19 @@ func Itrative(data []string, prompt string, c *genai.Client, conn *websocket.Con
 		wg.Add(1)
 		go func(fname string) {
 			defer wg.Done()
+			mu.Lock()
 			//conn.WriteJSON(utils.Response{Text: "⚙️ Started generation of " + file})
 			conn.WriteJSON(map[string]string{"codegenstart": "⚙️ Started generation of " + file})
-			code, tkn := CodeGen(prompt, fname, data)
+			ragout := RAGQueryDecider(prompt, conn, fname)
+			time.Sleep(time.Second * 5)
+			code, tkn := CodeGen(prompt, fname, data, ragout)
 			//conn.WriteJSON(utils.Response{Text: "✅ Completed generation of " + file})
 			conn.WriteJSON(map[string]string{"codegencomplete": "✅ Completed generation of " + file})
-			mu.Lock()
 			results[fname] = code
 			totaltkn += int(tkn)
 			mu.Unlock()
 		}(file)
-		time.Sleep(time.Second * 8)
+		time.Sleep(time.Second * 15)
 	}
 	wg.Wait()
 	fmt.Println(utils.Red("Code Gen Token - ", totaltkn))
@@ -50,11 +52,14 @@ func ItrativeWithoutGo(data []string, prompt string, c *genai.Client, conn *webs
 	// without go rountines
 	results := make(map[string]string)
 	totaltkn := 0
+	ragout := RAGQueryDecider(prompt, conn, "")
 
 	for _, file := range data {
-		conn.WriteJSON(utils.Response{Text: "⚙️ Started generation of " + file})
-		code, tkn := CodeGen(prompt, file, data)
-		conn.WriteJSON(utils.Response{Text: "✅ Completed generation of " + file})
+		conn.WriteJSON(map[string]string{"codegenstart": "⚙️ Started generation of " + file})
+		time.Sleep(time.Second * 2)
+
+		code, tkn := CodeGen(prompt, file, data, ragout)
+		conn.WriteJSON(map[string]string{"codegencomplete": "✅ Completed generation of " + file})
 		results[file] = code
 		totaltkn += int(tkn)
 		time.Sleep(time.Second * 2)
@@ -63,7 +68,7 @@ func ItrativeWithoutGo(data []string, prompt string, c *genai.Client, conn *webs
 	return results
 }
 
-func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32) {
+func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (string, int32) {
 	//fmt.Println(targetFile)
 	//fmt.Println(prompt)
 	c := models.GeminiModel()
@@ -74,16 +79,22 @@ func CodeGen(prompt string, targetFile string, allFiles []string) (string, int32
 	The frontend design consists of the following React .jsx files: %v.
 	Only generate the complete, valid React .jsx code for the file "%s".
 
-	### Rules:
-	1. The code must be self-contained, production-ready, and follow React best practices.
-	2. The component must be a functional component and the returned JSX must be wrapped in a single parent element.
-	3. Use only React, react-dom and Tailwind CSS (via className strings).
-	4. Do not use any external libraries (e.g., axios, classnames, react-router-dom (alternative of this can be used - react-dom), etc.).
-	5. All JSX array elements must be separated by commas.
-	6. Do not output explanations, comments, extra text, backslashes (\), or forward slashes (/) unless absolutely required inside valid JSX or string literals.
-	7. Do not use contractions like "don't" or "that's etc that has : ' in it".
-	8. Only return the code content for "%s".
-	`, allFiles, targetFile, targetFile)
+	### ABSOLUTE RULES:
+	1. Output ONLY the complete code for "%s". Nothing else.
+	2. The code must be self-contained, production-ready, and follow React best practices.
+	3. The component must be a functional component, with all JSX wrapped in a single parent element.
+	4. Use only React, react-dom, and Tailwind CSS (via className strings).
+	5. Do not import or use any other external libraries (axios, classnames, react-router-dom, etc.).
+	6. All JSX array elements must be separated by commas.
+	7. Never output explanations, comments, markdown formatting, or extra text outside of valid code.
+	8. Never output plain text or reasoning in natural language.
+	9. Never use contractions like "don't" or "that's".
+	10. If RAG output is provided, integrate it intelligently into the code. 
+		you can change colour in tailwind classes provided by rag and put ur own color according to theame main moto is to make it modern and cool
+		Do not copy-paste blindly; learn it and use accordingly into the component properly here is rag output - %v.
+	11. The final output must be ONLY the valid React .jsx code, nothing else.
+	12. use img url only if they needed if using then please use proper tailwind on img
+	`, allFiles, targetFile, targetFile, rag)
 
 	config := &genai.GenerateContentConfig{
 		Tools: []*genai.Tool{

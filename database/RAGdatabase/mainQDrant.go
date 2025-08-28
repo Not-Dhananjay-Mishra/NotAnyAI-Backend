@@ -11,8 +11,9 @@ import (
 
 func RAGinit(username string, data []utils.EmbeddingResponse, chunks []string) string {
 	client, err := qdrant.NewClient(&qdrant.Config{
-		Host: "localhost",
-		Port: 6334,
+		Host:   utils.QDRANT_URL,
+		Port:   6334,
+		APIKey: utils.QDRANT_API,
 	})
 	if err != nil {
 		log.Println(utils.Red("Error Connecting to Qdrant:"), err)
@@ -33,7 +34,7 @@ func RAGinit(username string, data []utils.EmbeddingResponse, chunks []string) s
 		return ""
 	}
 	for i := range data {
-		SendToVectorDB(data[i], collectionName, chunks[i])
+		SendToVectorDB(data[i], collectionName, chunks[i], chunks[i])
 	}
 	return collectionName
 }

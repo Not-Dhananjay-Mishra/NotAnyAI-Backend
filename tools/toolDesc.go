@@ -514,3 +514,24 @@ var PostCode = genai.FunctionDeclaration{
 		Required: []string{"components"},
 	},
 }
+
+var RAG = genai.FunctionDeclaration{
+	Name:        "rag",
+	Description: "Retrieves reusable Tailwind components for building websites",
+	Parameters: &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"rag": {
+				Type:        genai.TypeArray,
+				Description: "An array of Tailwind components needed to make web pages better, described in around 5 words and keep array length below or equals to 3",
+				Items:       &genai.Schema{Type: genai.TypeString},
+			},
+			"img": {
+				Type:        genai.TypeArray,
+				Description: "An array of image search queries that requried for website to make it cool",
+				Items:       &genai.Schema{Type: genai.TypeString},
+			},
+		},
+		Required: []string{"rag", "img"},
+	},
+}

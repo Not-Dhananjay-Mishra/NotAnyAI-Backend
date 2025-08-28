@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"server/utils"
 
 	"github.com/google/uuid"
@@ -19,26 +20,40 @@ type VectorSearchResponse struct {
 	} `json:"data"`
 }
 
-func QDrantLookup(s []float32, name string) {
-	client, _ := qdrant.NewClient(&qdrant.Config{
-		Host: "localhost",
-		Port: 6334,
+func QDrantLookup(s []float32, name string) string {
+	client, err := qdrant.NewClient(&qdrant.Config{
+		Host:   utils.QDRANT_URL,
+		Port:   6334,
+		APIKey: utils.QDRANT_API,
+		UseTLS: true,
 	})
+	if err != nil {
+		return ""
+	}
 
-	sus, _ := client.Query(context.Background(), &qdrant.QueryPoints{
+	points, err := client.Scroll(context.Background(), &qdrant.ScrollPoints{
 		CollectionName: name,
-		Query:          qdrant.NewQueryDense(s),
-		WithPayload:    qdrant.NewWithPayload(true)})
-	res, _ := json.Marshal(sus[0].Payload)
+		WithPayload:    qdrant.NewWithPayload(true),
+		Limit:          utils.ToPtr(uint32(10)), // fetch 10 candidates
+	})
+	if err != nil || len(points) == 0 {
+		return ""
+	}
+
+	idx := rand.Intn(len(points)) // pick random from fetched batch
+
+	res, _ := json.Marshal(points[idx].Payload)
 	var response VectorSearchResponse
 	json.Unmarshal(res, &response)
-	fmt.Println(response.Data.Kind.StringValue)
+	return response.Data.Kind.StringValue
 }
 
-func SendToVectorDB(data utils.EmbeddingResponse, collectionName string, payload string) {
+func SendToVectorDB(data utils.EmbeddingResponse, collectionName string, payload string, emb string) {
 	client, err := qdrant.NewClient(&qdrant.Config{
-		Host: "localhost",
-		Port: 6334,
+		Host:   utils.QDRANT_URL,
+		Port:   6334,
+		APIKey: utils.QDRANT_API,
+		UseTLS: true,
 	})
 	if err != nil {
 		log.Println(utils.Red("Error Connecting to Qdrant:"), err)

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	rag "server/RAG"
 	"server/auth"
 	codingmodel "server/models/CodingModel"
 	"server/utils"
@@ -74,6 +75,8 @@ func RouterHandler() {
 	router.HandleFunc("/validate", auth.GateKeeper).Methods("GET")
 	router.HandleFunc("/pingpong", ping).Methods("GET")
 	router.HandleFunc("/api/code", codingmodel.GetRequest).Methods("POST")
+	router.HandleFunc("/api/rag/sendtodb", rag.RAGSend).Methods("POST")
+	router.HandleFunc("/api/rag/lookup", rag.RAGLookup).Methods("POST")
 
 	corsWrappedRouter := corsMiddleware(router)
 

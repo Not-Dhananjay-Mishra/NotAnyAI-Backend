@@ -37,6 +37,9 @@ func main() {
 	utils.GITHUB_API = os.Getenv("GITHUB_API")
 	utils.STACKOVERFLOW_API = os.Getenv("STACKOVERFLOW_API")
 	utils.WEATHER_API = os.Getenv("WEATHER_API")
+	utils.QDRANT_URL = os.Getenv("QDRANT_URL")
+	utils.QDRANT_API = os.Getenv("QDRANT_API")
+	utils.PEXELS_API_KEY = os.Getenv("PEXELS_API_KEY")
 
 	// Start servers
 	blocker := make(chan any)
