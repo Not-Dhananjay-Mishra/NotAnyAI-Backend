@@ -27,7 +27,8 @@ Every response must be a single tool call, nothing else.
 If the user asks for RAG Lookup queries, always generate them as exactly 7-word queries. 
 Never add commentary, reasoning, or natural language text outside of the tool call.
 all the RAG queries must differ from each other no same kind of queries in tool
-also give search queries for img in img field keep the seach quries relevent so img can be find easily`
+also give search queries for img in img field keep the seach quries relevent so img can be find easily
+dont give text response give only tools response`
 
 func LookupHandlerinGO(data []string) string {
 	var results []string
@@ -60,7 +61,7 @@ func LookUP(pay string, coll string) string {
 	chunk := []string{pay}
 
 	embedings := ragdatabase.DoEmbedding(c, chunk)
-	if embedings == nil || len(embedings) == 0 {
+	if len(embedings) == 0 {
 		return "No embeddings generated"
 	}
 
@@ -93,9 +94,10 @@ func RAGQueryDecider(data string, conn *websocket.Conn, filename string) string 
 	fmt.Println(suseee.RAG)
 	var images []string
 	for _, i := range suseee.IMG {
-		img := individualtool.ImgSearch(i)
+		fmt.Println(i)
+		img := individualtool.ImgGenHuggingFace(i)
 		fmt.Println(utils.Magenta(img))
 		images = append(images, i+" "+img)
 	}
-	return LookupHandlerinGO(suseee.RAG) + " IMG: " + strings.Join(images, ", ")
+	return LookupHandlerinGO(suseee.RAG) + " IMG " + strings.Join(images, " ")
 }

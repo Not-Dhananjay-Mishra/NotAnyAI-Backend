@@ -528,7 +528,7 @@ var RAG = genai.FunctionDeclaration{
 			},
 			"img": {
 				Type:        genai.TypeArray,
-				Description: "An array of image search queries that requried for website to make it cool",
+				Description: "An array of image search queries that requried for website to make it cool max 1 image query",
 				Items:       &genai.Schema{Type: genai.TypeString},
 			},
 		},

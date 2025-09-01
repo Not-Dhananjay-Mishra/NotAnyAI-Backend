@@ -40,6 +40,7 @@ func main() {
 	utils.QDRANT_URL = os.Getenv("QDRANT_URL")
 	utils.QDRANT_API = os.Getenv("QDRANT_API")
 	utils.PEXELS_API_KEY = os.Getenv("PEXELS_API_KEY")
+	utils.GEMINI_API3_IMG = os.Getenv("GEN_IMG")
 
 	// Start servers
 	blocker := make(chan any)

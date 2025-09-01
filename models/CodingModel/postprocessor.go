@@ -7,6 +7,7 @@ import (
 	"server/models"
 	"server/tools"
 	"server/utils"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"google.golang.org/genai"
@@ -17,31 +18,24 @@ type PostCodeResponse struct {
 }
 
 const syspromptpost = `
-You are a coding assistant.
-Your task is to fix the given React code and return every React component in a JSON object.
+You are a coding assistant. Fix the given React code and return all components in a JSON object.
 
-### Rules:
-1. Each key must be the filename:
-   - Use "App.js" for the main entry file (only this file should end with .js).
-   - Use ".jsx" for all other components.
-2. Each value must be the **full valid React component code** for that file.
-3. Do not use any external libraries. Only use:
-   - React
-   - Tailwind CSS (via className strings)
-4. Do not output explanations, comments, or Markdown formatting.
-5. All Tailwind CSS classes must be valid.
-6. The JSON must follow this structure exactly:
+Rules:
+1. Keys = filenames: "App.js" for main, others end with ".jsx".
+2. Values = full valid React component code.
+3. Only use React + Tailwind (className) + react-dom 18.2.0.
+4. No external libs, no comments, no markdown, no extra text.
+5. Tailwind classes must be valid and visually consistent (modern, cool, vibing together).
+6. JSON format:
 
 {
-  "App.js": "<entire React code here>",
-  "ComponentName.jsx": "<entire React code here>",
-  ...
+  "App.js": "<code>",
+  "Component.jsx": "<code>"
 }
-
-7. Do not wrap the code in triple backticks.
-8. Do not include extra text outside the JSON object.
-9. give response in tools only no plain text
-10. main task u have to keep in mind website must look modern and cool and all tailwind class vibe with each other no two class colour very differently that doesnt make sense so make time vibing with each other
+also make sure that all the components are interlinked and navigation is done properly
+7. No backticks. Output ONLY JSON, inside tools.
+8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
+9. make the home page very attractive and modern and full of content.
 `
 
 func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
@@ -56,35 +50,63 @@ func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
 	return ans
 }
 
-func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn) map[string]string {
-	//conn.WriteJSON(utils.Response{Text: "⏳ Final processing, this may take a few minutes..."})
-	conn.WriteJSON(map[string]string{"processing": "⏳ Final processing, this may take a few minutes..."})
+func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt string, allFiles []string, rag string) map[string]string {
+	// Send initial processing message
+	if err := conn.WriteJSON(map[string]string{"processing": "⏳ Final processing, this may take a few minutes..."}); err != nil {
+		fmt.Println("WebSocket write error:", err)
+	}
+	time.Sleep(time.Second * 100)
+
 	c := models.GeminiModel()
 	ctx := context.Background()
 	config := &genai.GenerateContentConfig{
 		Tools: []*genai.Tool{
 			{FunctionDeclarations: []*genai.FunctionDeclaration{&tools.PostCode}},
 		},
-		SystemInstruction: &genai.Content{Parts: []*genai.Part{{Text: syspromptpost}}},
+		SystemInstruction: &genai.Content{
+			Parts: []*genai.Part{{Text: syspromptpost}},
+		},
 	}
-	fmt.Println(content)
-	result, err := c.Models.GenerateContent(
-		ctx,
-		"gemini-2.5-flash",
-		content,
-		config,
-	)
+
+	result, err := c.Models.GenerateContent(ctx, "gemini-2.5-flash", content, config)
 	if err != nil {
-		fmt.Println(utils.Red(err))
+		fmt.Println("GenerateContent error:", utils.Red(err))
+		return nil
 	}
-	//eee, _ := json.Marshal(result)
-	//fmt.Println(utils.Magenta(string(eee)))
-	res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
+
+	//temp, _ := json.Marshal(result)
+	//fmt.Println("PostProcessor Raw Response:", string(temp))
+	if len(result.Candidates) == 0 ||
+		result.Candidates[0].Content == nil ||
+		len(result.Candidates[0].Content.Parts) == 0 ||
+		result.Candidates[0].Content.Parts[0].FunctionCall == nil {
+		fmt.Println("Unexpected empty result from Gemini")
+		sus, _ := NotCodeGen(prompt, allFiles, "empty rag", conn)
+		return sus
+	}
+
+	// Extract args
+	res, err := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
+	if err != nil {
+		fmt.Println("Marshal error:", err)
+		return nil
+	}
+
 	var response PostCodeResponse
-	json.Unmarshal(res, &response)
-	tkn := result.UsageMetadata.TotalTokenCount
-	fmt.Println(utils.Red("Post Token - ", tkn))
-	//conn.WriteJSON(utils.Response{Text: "🎉 Done!"})
-	conn.WriteJSON(map[string]string{"processing": "🎉 Done!"})
+	if err := json.Unmarshal(res, &response); err != nil {
+		fmt.Println("Unmarshal error:", err)
+		return nil
+	}
+
+	// Token usage log
+	if result.UsageMetadata != nil {
+		fmt.Println(utils.Red("Post Token - ", result.UsageMetadata.TotalTokenCount))
+	}
+
+	// Final message
+	if err := conn.WriteJSON(map[string]string{"processing": "🎉 Done!"}); err != nil {
+		fmt.Println("WebSocket write error:", err)
+	}
+
 	return response.Components
 }

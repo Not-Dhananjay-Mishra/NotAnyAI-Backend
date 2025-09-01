@@ -76,24 +76,22 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 	sysprompt := fmt.Sprintf(`
 	You are a frontend code assistant.
 
-	The frontend design consists of the following React .jsx files: %v.
-	Only generate the complete, valid React .jsx code for the file "%s".
+	The project has React .jsx files: %v. Generate ONLY the full, valid code for "%s".
 
-	### ABSOLUTE RULES:
-	1. Output ONLY the complete code for "%s". Nothing else.
-	2. The code must be self-contained, production-ready, and follow React best practices.
-	3. The component must be a functional component, with all JSX wrapped in a single parent element.
-	4. Use only React, react-dom, and Tailwind CSS (via className strings).
-	5. Do not import or use any other external libraries (axios, classnames, react-router-dom, etc.).
-	6. All JSX array elements must be separated by commas.
-	7. Never output explanations, comments, markdown formatting, or extra text outside of valid code.
-	8. Never output plain text or reasoning in natural language.
-	9. Never use contractions like "don't" or "that's".
-	10. If RAG output is provided, integrate it intelligently into the code. 
-		you can change colour in tailwind classes provided by rag and put ur own color according to theame main moto is to make it modern and cool
-		Do not copy-paste blindly; learn it and use accordingly into the component properly here is rag output - %v.
-	11. The final output must be ONLY the valid React .jsx code, nothing else.
-	12. use img url only if they needed if using then please use proper tailwind on img
+	Rules:
+	1. Output ONLY the complete code for "%s".
+	2. Code must be self-contained, production-ready, modern, with animation.
+	3. Use functional components, single parent JSX, React + react-dom 18.2.0 + Tailwind only.
+	4. No other libraries, no comments, no markdown, no extra text.
+	5. JSX arrays need commas, no contractions.
+	6. Apply RAG intelligently: adjust Tailwind colors for a modern/cool theme, not copy-paste. RAG: %v.
+	7. Use img URLs only if needed, styled with proper Tailwind given in RAG.
+	8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
+	9. try to add animations and interactivity to make the UI more engaging.
+	10. use three.js three-js-react for 3d models and animations if needed.
+	11. add svg for icons and illustrations.
+	12. dont use comments in the code.
+	13. use images (make on ur own svg and add that) and animations to make the UI more engaging.
 	`, allFiles, targetFile, targetFile, rag)
 
 	config := &genai.GenerateContentConfig{
@@ -109,10 +107,16 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 		config,
 	)
 	if err != nil {
-		fmt.Println(utils.Red("TOKEN KATAM HOGAYE!!"))
-
+		if rag == "empty rag" {
+			fmt.Println(utils.Red("Error even after retrying without RAG:", err))
+			return "", 0
+		}
+		//retry without rag
+		fmt.Println(utils.Red("Retrying without RAG due to error:", err))
+		time.Sleep(time.Second * 70)
+		res, tkn := CodeGen(prompt, targetFile, allFiles, "empty rag")
 		fmt.Println(err)
-		return "", 0
+		return res, tkn
 	}
 	if result.Candidates[0].Content.Parts[0].FunctionCall.Args == nil {
 		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0])

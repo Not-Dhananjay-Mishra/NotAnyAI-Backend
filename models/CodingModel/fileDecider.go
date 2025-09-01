@@ -31,6 +31,7 @@ const sysprompt = `You are a frontend code assistant. For any given prompt,
 	if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, 
 	explanations, or extra text—only return valid file names via the provided tool.
 	The count of files should be kept to the absolute minimum required to fulfill the user's request.
+	no follow up questions.
 	`
 
 type Sus struct {
@@ -90,11 +91,9 @@ func FileDecider(data Sus, conn *websocket.Conn) map[string]string {
 	//itrative generating code
 	time.Sleep(time.Second * 2)
 	suse := ItrativeWithoutGo(suseee.Filename, data.Query, c, conn)
-
-	//fmt.Println(sus)
+	//return suse
 	content := MapToContent(suse, conn)
-	sus := CodingPostProcessor(content, conn)
-	//fmt.Println(utils.Blue(sus))
+	sus := CodingPostProcessor(content, conn, data.Query, suseee.Filename, "")
 	return sus
 }
 
