@@ -92,6 +92,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 	11. add svg for icons and illustrations.
 	12. dont use comments in the code.
 	13. use images (make on ur own svg and add that) and animations to make the UI more engaging.
+	14. make the home page very attractive and modern and full of content.
 	`, allFiles, targetFile, targetFile, rag)
 
 	config := &genai.GenerateContentConfig{
@@ -118,10 +119,35 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 		fmt.Println(err)
 		return res, tkn
 	}
+	if len(result.Candidates) == 0 {
+		if rag == "empty rag" {
+			fmt.Println(utils.Red("No candidates even after retrying without RAG"))
+			return "", 0
+		}
+		time.Sleep(time.Second * 7)
+		d, tkn := CodeGen(prompt+"give response in tool only", targetFile, allFiles, "empty rag")
+		return d, tkn
+	}
+	if len(result.Candidates[0].Content.Parts) == 0 {
+		if rag == "empty rag" {
+			fmt.Println(utils.Red("No content parts even after retrying without RAG"))
+			return "", 0
+		}
+		time.Sleep(time.Second * 7)
+		d, tkn := CodeGen(prompt+"give response in tool only", targetFile, allFiles, "empty rag")
+		return d, tkn
+	}
+
 	if result.Candidates[0].Content.Parts[0].FunctionCall.Args == nil {
+		if rag == "empty rag" {
+			fmt.Println(utils.Red("No function call args even after retrying without RAG"))
+			return "", 0
+		}
 		res, _ := json.Marshal(result.Candidates[0].Content.Parts[0])
 		fmt.Println(string(res))
-		return "", result.UsageMetadata.TotalTokenCount
+		time.Sleep(time.Second * 7)
+		d, tkn := CodeGen(prompt+"give response in tool only", targetFile, allFiles, "empty rag")
+		return d, tkn
 	}
 	res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
 	tkn := result.UsageMetadata.TotalTokenCount

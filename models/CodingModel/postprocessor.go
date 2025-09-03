@@ -35,7 +35,6 @@ Rules:
 also make sure that all the components are interlinked and navigation is done properly
 7. No backticks. Output ONLY JSON, inside tools.
 8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
-9. make the home page very attractive and modern and full of content.
 `
 
 func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
