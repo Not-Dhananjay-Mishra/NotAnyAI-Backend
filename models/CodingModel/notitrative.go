@@ -8,6 +8,7 @@ import (
 	"server/models"
 	"server/tools"
 	"server/utils"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"google.golang.org/genai"
@@ -21,6 +22,7 @@ func NotCodeGen(prompt string, allFiles []string, rag string, conn *websocket.Co
 	if err := conn.WriteJSON(map[string]string{"processing": "Model Overloaded retrying final time please wait..."}); err != nil {
 		fmt.Println("WebSocket write error:", err)
 	}
+	time.Sleep(time.Second * 60)
 	// Build system prompt
 	sysprompt := fmt.Sprintf(`
 You are a frontend code assistant.
