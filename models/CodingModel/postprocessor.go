@@ -33,7 +33,7 @@ Rules:
   "Component.jsx": "<code>"
 }
 also make sure that all the components are interlinked and navigation is done properly
-7. No backticks. Output ONLY JSON, inside tools.
+7. No backticks or ' in sentence. Output ONLY JSON, inside tools.
 8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
 `
 
@@ -70,7 +70,8 @@ func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt 
 	result, err := c.Models.GenerateContent(ctx, "gemini-2.5-flash", content, config)
 	if err != nil {
 		fmt.Println("GenerateContent error:", utils.Red(err))
-		return nil
+		sus, _ := NotCodeGen(prompt, allFiles, "empty rag", conn)
+		return sus
 	}
 
 	//temp, _ := json.Marshal(result)
