@@ -18,7 +18,7 @@ type Data struct {
 	ID             any    `bson:"_id,omitempty"`
 	Username       string `bson:"username"`
 	Password       string `bson:"password"`
-	Sitecraftlimit string `bson:"sitecraftlimit"`
+	Sitecraftlimit int    `bson:"sitecraftlimit"`
 }
 
 var dbcoll *mongo.Collection
@@ -73,7 +73,7 @@ func AddUser(username string, password string) error {
 	_, err := dbcoll.InsertOne(context.TODO(), bson.M{
 		"username":       username,
 		"password":       password,
-		"sitecraftlimit": "5",
+		"sitecraftlimit": 5,
 	})
 	if err != nil {
 		log.Println("Error writing in DB:", err)
@@ -88,7 +88,7 @@ func TestPrintAllUser() {
 		fmt.Println(i, j)
 	}
 }
-func GetUserLimit(username string) (string, error) {
+func GetUserLimit(username string) (int, error) {
 	var result Data
 	filter := bson.M{"username": username}
 	err := dbcoll.FindOne(context.TODO(), filter).Decode(&result)
@@ -99,8 +99,18 @@ func GetUserLimit(username string) (string, error) {
 	}
 	//log.Println(result)
 	if result.Password == "" {
-		return "", errors.New("not exist")
+		return 0, errors.New("not exist")
 	}
 
 	return result.Sitecraftlimit, nil
+}
+
+func UpdateLimit(username string, newLimit int) {
+	filter := bson.M{"username": username}
+	update := bson.M{"$set": bson.M{"sitecraftlimit": newLimit}}
+
+	_, err := dbcoll.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Println("Error updating user sitecraftlimit:", err)
+	}
 }

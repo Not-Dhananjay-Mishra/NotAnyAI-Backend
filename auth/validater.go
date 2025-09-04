@@ -6,6 +6,7 @@ import (
 	"net/http"
 	mongodb "server/database/MongoDB"
 	"server/utils"
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -36,6 +37,6 @@ func GateKeeper(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"username":       claim.Username,
 		"status":         "done",
-		"sitecraftlimit": limit,
+		"sitecraftlimit": strconv.Itoa(limit),
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"log"
 	"os"
+	mongodb "server/database/MongoDB"
 	"server/models"
 	codingmodel "server/models/CodingModel"
 	"server/utils"
@@ -70,7 +71,12 @@ func HandleConn(conn *websocket.Conn, username string) {
 		receivedData := data
 		log.Println(utils.Blue(receivedData.Query))
 		if receivedData.Query != "" {
-
+			linit, _ := mongodb.GetUserLimit(username)
+			if linit <= 0 {
+				conn.WriteJSON(map[string]string{"processing": "You have exhausted your limit. Please talk to developer to continue using the service."})
+				continue
+			}
+			mongodb.UpdateLimit(username, linit-1)
 			prompt := receivedData.Query
 			models.AddToMemoryUSER(username, prompt)
 			aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
