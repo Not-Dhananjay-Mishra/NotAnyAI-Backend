@@ -22,12 +22,18 @@ type Data struct {
 
 var dbcoll *mongo.Collection
 
-func init() {
-	uri := "mongodb://localhost:27017"
-	client, err := mongo.Connect(options.Client().ApplyURI(uri))
+func DBinit() {
+	uri := utils.MONGODB_CLUSTER
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	client, err := mongo.Connect(options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI))
 	if err != nil {
-		log.Println("Failed to connect to database")
-		return
+		log.Fatalf("Failed to create client: %v", err)
+	}
+
+	// verify connection
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
 	}
 	coll := client.Database("nothing").Collection("user")
 	dbcoll = coll
@@ -36,9 +42,6 @@ func init() {
 }
 
 func GetUserPassword(username string) (string, error) {
-	if username == "techdm" || username == "Gaurav" {
-		return "2024", nil
-	}
 	var result Data
 	filter := bson.M{"username": username}
 	err := dbcoll.FindOne(context.TODO(), filter).Decode(&result)

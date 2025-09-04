@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	mongodb "server/database/MongoDB"
 	codingmodel "server/models/CodingModel"
 	"server/router"
 	"server/utils"
@@ -41,7 +42,11 @@ func main() {
 	utils.QDRANT_API = os.Getenv("QDRANT_API")
 	utils.PEXELS_API_KEY = os.Getenv("PEXELS_API_KEY")
 	utils.GEMINI_API3_IMG = os.Getenv("GEN_IMG")
+	utils.MONGODB_USERNAME = os.Getenv("MONGODB_USERNAME")
+	utils.MONGODB_PASSWORD = os.Getenv("MONGODB_PASSWORD")
+	utils.MONGODB_CLUSTER = os.Getenv("MONGODB_CLUSTER")
 
+	mongodb.DBinit()
 	// Start servers
 	blocker := make(chan any)
 	go router.RouterHandler()
