@@ -33,7 +33,7 @@ Rules:
   "Component.jsx": "<code>"
 }
 also make sure that all the components are interlinked and navigation is done properly
-7. No backticks or ' in sentence. Output ONLY JSON, inside tools.
+7. No backticks or semicolon in sentence (for example dont't player's computer's etc have semicolon never use that). Output ONLY JSON, inside tools.
 8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
 `
 
