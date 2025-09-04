@@ -61,6 +61,12 @@ func HandleConn(conn *websocket.Conn, username string) {
 			continue
 
 		} else if data.Agent == "code" {
+			linit, _ := mongodb.GetUserLimit(username)
+			if linit <= 0 {
+				conn.WriteJSON(map[string]string{"processing": "You have exhausted your limit. Please talk to developer to continue using the service."})
+				continue
+			}
+			mongodb.UpdateLimit(username, linit-1)
 			replyCh := make(chan map[string]string, 1)
 			codingmodel.UnderProcessCode <- codingmodel.Process{Data: codingmodel.Sus{Query: data.Query}, ReplyCh: replyCh, Conn: conn}
 			result := <-replyCh
@@ -71,12 +77,7 @@ func HandleConn(conn *websocket.Conn, username string) {
 		receivedData := data
 		log.Println(utils.Blue(receivedData.Query))
 		if receivedData.Query != "" {
-			linit, _ := mongodb.GetUserLimit(username)
-			if linit <= 0 {
-				conn.WriteJSON(map[string]string{"processing": "You have exhausted your limit. Please talk to developer to continue using the service."})
-				continue
-			}
-			mongodb.UpdateLimit(username, linit-1)
+
 			prompt := receivedData.Query
 			models.AddToMemoryUSER(username, prompt)
 			aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
