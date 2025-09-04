@@ -81,7 +81,7 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 	Rules:
 	1. Output ONLY the complete code for "%s".
 	2. Code must be self-contained, production-ready, modern, with animation.
-	3. Use functional components, single parent JSX, React + react-dom 18.2.0 + Tailwind only.
+	3. Use functional components, single parent JSX, React + react-dom 18.2.0 + motion/react (animation) + Tailwind only.
 	4. No other libraries, no comments, no markdown, no extra text.
 	5. JSX arrays need commas, no contractions.
 	6. Apply RAG intelligently: adjust Tailwind colors for a modern/cool theme, not copy-paste. RAG: %v.

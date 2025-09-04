@@ -23,7 +23,7 @@ You are a coding assistant. Fix the given React code and return all components i
 Rules:
 1. Keys = filenames: "App.js" for main, others end with ".jsx".
 2. Values = full valid React component code.
-3. Only use React + Tailwind (className) + react-dom 18.2.0.
+3. Only use React + Tailwind (className) + react-dom 18.2.0 + motion/react.
 4. No external libs, no comments, no markdown, no extra text.
 5. Tailwind classes must be valid and visually consistent (modern, cool, vibing together).
 6. JSON format:
@@ -35,6 +35,7 @@ Rules:
 also make sure that all the components are interlinked and navigation is done properly
 7. No backticks or semicolon in sentence (for example dont't player's computer's etc have semicolon never use that). Output ONLY JSON, inside tools.
 8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
+9. Everything must be in functional components. no error must be there.
 `
 
 func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
