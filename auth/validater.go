@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	mongodb "server/database/MongoDB"
 	"server/utils"
 
 	"github.com/dgrijalva/jwt-go"
@@ -28,11 +29,13 @@ func GateKeeper(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"status": "error"})
 		return
 	}
+	limit, _ := mongodb.GetUserLimit(claim.Username)
 	log.Println("User pass through gate: ", claim.Username)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
-		"username": claim.Username,
-		"status":   "done",
+		"username":       claim.Username,
+		"status":         "done",
+		"sitecraftlimit": limit,
 	})
 }

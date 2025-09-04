@@ -15,9 +15,10 @@ import (
 var alldata = make(map[string]string)
 
 type Data struct {
-	ID       any    `bson:"_id,omitempty"`
-	Username string `bson:"username"`
-	Password string `bson:"password"`
+	ID             any    `bson:"_id,omitempty"`
+	Username       string `bson:"username"`
+	Password       string `bson:"password"`
+	Sitecraftlimit string `bson:"sitecraftlimit"`
 }
 
 var dbcoll *mongo.Collection
@@ -70,8 +71,9 @@ func AddUser(username string, password string) error {
 
 	alldata[username] = password
 	_, err := dbcoll.InsertOne(context.TODO(), bson.M{
-		"username": username,
-		"password": password,
+		"username":       username,
+		"password":       password,
+		"sitecraftlimit": "5",
 	})
 	if err != nil {
 		log.Println("Error writing in DB:", err)
@@ -85,4 +87,20 @@ func TestPrintAllUser() {
 	for i, j := range alldata {
 		fmt.Println(i, j)
 	}
+}
+func GetUserLimit(username string) (string, error) {
+	var result Data
+	filter := bson.M{"username": username}
+	err := dbcoll.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		log.Println("Error finding user:", err)
+	} else {
+		fmt.Printf("User found: %+v\n", result.ID)
+	}
+	//log.Println(result)
+	if result.Password == "" {
+		return "", errors.New("not exist")
+	}
+
+	return result.Sitecraftlimit, nil
 }
