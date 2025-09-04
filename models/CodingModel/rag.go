@@ -7,8 +7,6 @@ import (
 	ragdatabase "server/database/RAGdatabase"
 	"server/models"
 	"server/tools"
-	individualtool "server/tools/individualTool"
-	"server/utils"
 	"strings"
 	"sync"
 
@@ -95,9 +93,9 @@ func RAGQueryDecider(data string, conn *websocket.Conn, filename string) string 
 	var images []string
 	for _, i := range suseee.IMG {
 		fmt.Println(i)
-		img := individualtool.ImgGenHuggingFace(i)
-		fmt.Println(utils.Magenta(img))
-		images = append(images, i+" "+img)
+		//img := individualtool.ImgGenHuggingFace(i)
+		//fmt.Println(utils.Magenta(img))
+		//images = append(images, i+" "+img)
 	}
 	return LookupHandlerinGO(suseee.RAG) + " IMG " + strings.Join(images, " ")
 }
