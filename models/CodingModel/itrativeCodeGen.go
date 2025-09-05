@@ -74,26 +74,46 @@ func CodeGen(prompt string, targetFile string, allFiles []string, rag string) (s
 	c := models.GeminiModel()
 	ctx := context.Background()
 	sysprompt := fmt.Sprintf(`
-	You are a frontend code assistant.
+You are a frontend code assistant.
 
-	The project has React .jsx files: %v. Generate ONLY the full, valid code for "%s".
+The project has React .jsx files: %v. Generate ONLY the full, valid code for "%s".
 
-	Rules:
-	1. Output ONLY the complete code for "%s".
-	2. Code must be self-contained, production-ready, modern, with animation.
-	3. Use functional components, single parent JSX, React + react-dom 18.2.0 + framer-motion 11.2.6 (animation) + Tailwind only.
-	4. No other libraries, no comments, no markdown, no extra text No backticks or semicolon in sentence (for example dont't player's computer's etc have semicolon never use that).
-	5. JSX arrays need commas, no contractions.
-	6. Apply RAG intelligently: adjust Tailwind colors for a modern/cool theme, not copy-paste. RAG: %v.
-	7. Use img URLs only if needed, styled with proper Tailwind given in RAG.
-	8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
-	9. try to add animations and interactivity to make the UI more engaging.
-	10. use three.js three-js-react for 3d models and animations if needed.
-	11. add svg for icons and illustrations.
-	12. dont use comments in the code.
-	13. use images (make on ur own svg and add that) and animations to make the UI more engaging.
-	14. make the home page very attractive and modern and full of content.
-	`, allFiles, targetFile, targetFile, rag)
+Rules:
+1. Output ONLY the complete code for "%s".
+2. Code must be self-contained, production-ready, responsive, modern, and engaging.
+3. Use functional components with a single parent JSX element.
+4. Allowed libraries: React + react-dom 18.2.0 + framer-motion 11.2.6 + Tailwind. Nothing else.
+5. Do not use comments, markdown, extra text, backticks, or contractions (no dont, cant, etc).
+6. JSX arrays must always use commas.
+7. Apply RAG intelligently: adjust Tailwind colors, spacing, and vibe for a modern theme. RAG: %v.
+8. Use image URLs only if needed, styled consistently with Tailwind and RAG.
+
+Design & Interaction Rules:
+9. Navigation handled with React state or react-dom 18.2.0 + conditional rendering (no react-router-dom).
+10. Apply RAG: adjust Tailwind colors and vibes for modern/cool look. If %v is empty or irrelevant, do not force RAG.
+11. Use SVG icons/illustrations (inline, optimized, accessible). No external icon libs.
+12. Use animations & interactivity (hover, focus, transitions, subtle motion).
+13. Create fully responsive layouts using Tailwind responsive utilities (mobile → tablet → desktop).
+14. Prioritize accessibility: semantic HTML, aria-labels, keyboard navigation, sufficient color contrast.
+15. Keep UI balanced: proper spacing, readable typography, clear hierarchy (header, hero, features, content, CTA, footer).
+16. Avoid clutter: only include essential elements per screen.
+
+Code Style & Structure:
+17. Components must be functional React components using ES6 exports.
+18. Minimal state management with useState/useEffect only.
+19. Each file should contain only one component with a single responsibility.
+20. Use Tailwind utilities instead of inline styles.
+21. Use placeholder loading states for async content.
+22. When images are needed, provide alt text and fallback.
+23. SVG illustrations should be <2KB where possible and include aria-hidden or role attributes.
+24. Simulate 3D with CSS/SVG unless user explicitly confirms three-js-react usage.
+25. Ensure interactivity has micro-interactions (hover glow, subtle motion, button scale).
+26. Include a simple footer with links, credits, or branding for completeness.
+
+Conflict Resolution:
+27. If any rules conflict, prioritize rules 4 and 5 (library and formatting constraints).
+28. All outputs must strictly follow these rules without deviation.
+`, allFiles, targetFile, targetFile, rag, rag)
 
 	config := &genai.GenerateContentConfig{
 		Tools: []*genai.Tool{
