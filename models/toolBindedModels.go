@@ -29,6 +29,7 @@ type Agent struct {
 	AIGoogleSearchTool      FunctionArgs `json:"google_search_aitool"`
 	StackoverflowSearchTool FunctionArgs `json:"stackoverflow_searchtool"`
 	GithubSearchTool        FunctionArgs `json:"github_searchtool"`
+	SitecraftTool           FunctionArgs `json:"usesitecraft"`
 }
 
 func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, conn *websocket.Conn) string {
@@ -105,6 +106,12 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		var data Agent
 		json.Unmarshal(res, &data)
 		fmt.Println(utils.Cyan(string(res)))
+
+		if data.SitecraftTool.UseTool {
+			conn.WriteJSON(map[string]string{"text": "Using sitecraft to make website want to continue? \n " + data.SitecraftTool.Query[0], "sitecraft": "true"})
+			return "sitecraftinuse"
+		}
+
 		conn.WriteJSON(utils.Response{Text: "Searching with tools"})
 		content := ToolCaller(data, p, conn)
 		sus := StreamPostProcessing(c, username, content, p, prompt, conn)

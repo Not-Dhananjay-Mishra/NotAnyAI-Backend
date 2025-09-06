@@ -81,6 +81,9 @@ func HandleConn(conn *websocket.Conn, username string) {
 			prompt := receivedData.Query
 			models.AddToMemoryUSER(username, prompt)
 			aires := models.ModelWithTools(client, utils.MemoryStore[username], username, conn)
+			if aires == "sitecraftinuse" {
+				continue
+			}
 			conn.WriteJSON(utils.Response{Text: aires})
 		}
 	}
