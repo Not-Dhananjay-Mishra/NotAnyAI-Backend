@@ -459,9 +459,9 @@ var NewToolDeciderAgent = genai.FunctionDeclaration{
 			},
 			"usesitecraft": {
 				Type:        genai.TypeObject,
-				Description: "it makes website using sitecraft ai only use this tool when user ask for website",
+				Description: "it makes website/web app using. only use this tool when user ask for website",
 				Properties: map[string]*genai.Schema{
-					"usetool": {Type: genai.TypeBoolean, Description: "True if YouTube video search is needed."},
+					"usetool": {Type: genai.TypeBoolean, Description: "True if want to make website."},
 					"query":   {Type: genai.TypeArray, Items: &genai.Schema{Type: genai.TypeString}, Description: "queries for sitecraft to make website"},
 				},
 			},
