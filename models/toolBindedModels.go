@@ -105,8 +105,7 @@ func ModelWithTools(c *genai.Client, prompt []*genai.Content, username string, c
 		res, _ := json.Marshal(part.FunctionCall.Args)
 		var data Agent
 		json.Unmarshal(res, &data)
-		fmt.Println(utils.Cyan(string(res)))
-
+		fmt.Println(data)
 		if data.SitecraftTool.UseTool {
 			conn.WriteJSON(map[string]string{"text": "Using sitecraft to make website want to continue? \n " + data.SitecraftTool.Query[0], "sitecraft": "true"})
 			return "sitecraftinuse"
