@@ -32,7 +32,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Request no user found with: ", data.Username)
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"status": "error"})
+		json.NewEncoder(w).Encode(map[string]string{"status": "error1"})
 		return
 	}
 	//database.TestPrintAllUser()
@@ -40,7 +40,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if pass != data.Password {
 		log.Println("Request failed password not matched: ", data)
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"status": "error"})
+		json.NewEncoder(w).Encode(map[string]string{"status": "error2"})
 		return
 	}
 
@@ -55,7 +55,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Request failed internal error: ", data)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"status": "error"})
+		json.NewEncoder(w).Encode(map[string]string{"status": "error3"})
 		return
 	}
 	log.Println("Request passed: ", data)

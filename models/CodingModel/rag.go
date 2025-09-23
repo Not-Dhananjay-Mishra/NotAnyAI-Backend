@@ -26,7 +26,9 @@ If the user asks for RAG Lookup queries, always generate them as exactly 7-word 
 Never add commentary, reasoning, or natural language text outside of the tool call.
 all the RAG queries must differ from each other no same kind of queries in tool
 also give search queries for img in img field keep the seach quries relevent so img can be find easily
-dont give text response give only tools response`
+dont give text response give only tools response
+RULE - Only use tool dont give ans in text	
+`
 
 func LookupHandlerinGO(data []string) string {
 	var results []string

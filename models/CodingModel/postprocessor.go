@@ -14,28 +14,36 @@ import (
 )
 
 type PostCodeResponse struct {
-	Components map[string]string `json:"components"`
+	FrontendCode map[string]string `json:"frontendCode"`
+	BackendCode  map[string]string `json:"backendCode"`
 }
 
 const syspromptpost = `
-You are a coding assistant. Fix the given React code and return all components in a JSON object.
+You are a coding assistant. Fix the given NextJS/React code and return all components in a JSON object matching this schema:
 
 Rules:
-1. Keys = filenames: "App.js" for main, others end with ".jsx".
-2. Values = full valid React component code.
-3. Only use React + Tailwind (className) + react-dom 18.2.0 + framer-motion 11.2.6.
-4. No external libs, no comments, no markdown, no extra text.
-5. Tailwind classes must be valid and visually consistent (modern, cool, vibing together).
-6. JSON format:
+1. Frontend pages go under "frontendCode". Keys = filenames like App.js, index.js, shop.js. Values = full valid React/NextJS code.
+2. Backend API files go under "backendCode". Keys = filenames like hello.js, cart.js. Values = full valid API code (assume they are inside pages/api/).
+4. Only use React + Tailwind (className) + react-dom 18.2.0 + framer-motion 11.2.6. No other libraries.
+5. No comments, markdown, extra text, or explanations.
+6. Tailwind classes must be consistent, modern, visually appealing.
+7. All components must be interlinked and navigation must be handled via React state or conditional rendering. Do not use react-router-dom.
+8. All components must be functional components with no errors.
+9. Output JSON strictly in the format:
 
 {
-  "App.js": "<code>",
-  "Component.jsx": "<code>"
+  "frontendCode": {
+    "App.js": "<code>",
+    "index.js": "<code>"
+  },
+  "backendCode": {
+    "hello.js": "<code>"
+  },
 }
-also make sure that all the components are interlinked and navigation is done properly
-7. No backticks or semicolon in sentence (for example dont't player's computer's etc have semicolon never use that). Output ONLY JSON, inside tools.
-8. Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
-9. Everything must be in functional components. no error must be there.
+
+10. Do not use backticks, semicolons, or contractions in the text. Output ONLY JSON, inside tools.
+11. Always output plain code without backticks, markdown fences, string interpolation markers, or extra escape characters.
+12. all code must be interconnected like api (backend) and pages (frontend) and code should work properly as code directly go to nextjs
 `
 
 func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
@@ -50,7 +58,7 @@ func MapToContent(m map[string]string, conn *websocket.Conn) []*genai.Content {
 	return ans
 }
 
-func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt string, allFiles []string, rag string) map[string]string {
+func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt string, allFiles []string, rag string) PostCodeResponse {
 	// Send initial processing message
 	if err := conn.WriteJSON(map[string]string{"processing": "⏳ Final processing, this may take a few minutes..."}); err != nil {
 		fmt.Println("WebSocket write error:", err)
@@ -90,13 +98,13 @@ func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt 
 	res, err := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
 	if err != nil {
 		fmt.Println("Marshal error:", err)
-		return nil
+		return PostCodeResponse{}
 	}
 
 	var response PostCodeResponse
 	if err := json.Unmarshal(res, &response); err != nil {
 		fmt.Println("Unmarshal error:", err)
-		return nil
+		return PostCodeResponse{}
 	}
 
 	// Token usage log
@@ -108,6 +116,17 @@ func CodingPostProcessor(content []*genai.Content, conn *websocket.Conn, prompt 
 	if err := conn.WriteJSON(map[string]string{"processing": "🎉 Done!"}); err != nil {
 		fmt.Println("WebSocket write error:", err)
 	}
+	PrintCodeDebug(response)
+	return response
+}
 
-	return response.Components
+func PrintCodeDebug(data PostCodeResponse) {
+	fmt.Println("Frontend Code:")
+	for filename := range data.FrontendCode {
+		fmt.Printf("File: %s\n", filename)
+	}
+	fmt.Println("Backend Code:")
+	for filename := range data.BackendCode {
+		fmt.Printf("File: %s\n", filename)
+	}
 }

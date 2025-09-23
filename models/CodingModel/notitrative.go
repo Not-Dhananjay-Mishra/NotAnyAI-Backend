@@ -15,49 +15,62 @@ import (
 )
 
 type GeneratedCode struct {
-	Code map[string]string `json:"components"`
+	FrontendCode map[string]string `json:"frontendCode"`
+	BackendCode  map[string]string `json:"backendCode"`
+	Components   map[string]string `json:"components"`
 }
 
-func NotCodeGen(prompt string, allFiles []string, rag string, conn *websocket.Conn) (map[string]string, int32) {
+func NotCodeGen(prompt string, allFiles []string, rag string, conn *websocket.Conn) (PostCodeResponse, int32) {
 	if err := conn.WriteJSON(map[string]string{"processing": "Model Overloaded retrying final time please wait..."}); err != nil {
 		fmt.Println("WebSocket write error:", err)
 	}
 	time.Sleep(time.Second * 60)
 	// Build system prompt
 	sysprompt := fmt.Sprintf(`
-You are a frontend code assistant.
+You are a Next.js code assistant.
 
-The project has React .jsx files: %v. Generate ONLY the full, valid code.
+The project has:
+- Frontend React .js pages and Backend API route files: %v
+
+Generate ONLY the full, valid code.
 
 Rules:
 
-Keys = filenames: "App.js" for main, others end with ".jsx".
+Frontend:
+- Keys = filenames inside "pages/" (e.g., "index.js", "about.jsx").
+- Values = full valid React component code.
+- Use React + Tailwind (className) + react-dom 18.2.0 only.
+- No external libs, no comments, no markdown, no extra text.
+- Tailwind classes must be valid and visually consistent (modern, cool, vibing together).
+- Navigation must be handled with React state or conditional rendering instead of react-router-dom.
+- Apply RAG intelligently: adjust Tailwind colors for a modern/cool theme, not copy-paste. If you don't want RAG: %v.
+- Use img URLs only if needed, styled with proper Tailwind given in RAG.
+- Try to add animations and interactivity to make the UI more engaging.
+- Use three.js with react-three-fiber and drei for 3D models and animations if needed.
+- Add SVGs for icons and illustrations.
+- Do not use comments in the code.
 
-Values = full valid React component code.
-
-Only use React + Tailwind (className) + react-dom 18.2.0.
-
-No external libs, no comments, no markdown, no extra text.
-
-Tailwind classes must be valid and visually consistent (modern, cool, vibing together).
+Backend:
+- Keys = filenames inside "pages/api/" (e.g., "hello.js").
+- Values = full valid Next.js API route code (export default handler).
+- Must return JSON responses.
+- Use only Node.js built-in modules and Next.js conventions.
+- No external libraries beyond those already specified.
 
 JSON format:
 
 {
-"App.js": "<code>",
-"Component.jsx": "<code>"
+  "frontendCode": {
+    "index.js": "<code>",
+    "about.jsx": "<code>"
+  },
+  "backendCode": {
+    "hello.js": "<code>",
+    "auth.js": "<code>"
+  }
 }
 
 No backticks. Output ONLY JSON, inside tools.
-
-Navigation must be handled with React state or react-dom 18.2.0 and conditional rendering instead of react-router-dom.
-Apply RAG intelligently: adjust Tailwind colors for a modern/cool theme, not copy-paste. if u dont want RAG: %v.
-Use img URLs only if needed, styled with proper Tailwind given in RAG.
-Try to add animations and interactivity to make the UI more engaging.
-Use three.js three-js-react for 3d models and animations if needed.
-Add svg for icons and illustrations.
-Do not use comments in the code.
-Use images (make your own svg and add that) and animations to make the UI more engaging.
 `, allFiles, rag)
 
 	// Create client
@@ -84,7 +97,7 @@ Use images (make your own svg and add that) and animations to make the UI more e
 	if err != nil {
 		log.Println("GenerateContent error:", utils.Red(err))
 		conn.WriteJSON(map[string]string{"processing": "Error from model, please try again later."})
-		return nil, 0
+		return PostCodeResponse{}, 0
 	}
 
 	// Debug print of raw response (safe for local debugging)
@@ -99,9 +112,9 @@ Use images (make your own svg and add that) and animations to make the UI more e
 		log.Println("Unexpected empty result from Gemini or missing function call")
 		// Try to return token usage if available
 		if result.UsageMetadata != nil {
-			return nil, int32(result.UsageMetadata.TotalTokenCount)
+			return PostCodeResponse{}, int32(result.UsageMetadata.TotalTokenCount)
 		}
-		return nil, 0
+		return PostCodeResponse{}, 0
 	}
 
 	part := result.Candidates[0].Content.Parts[0]
@@ -109,22 +122,22 @@ Use images (make your own svg and add that) and animations to make the UI more e
 		res, _ := json.Marshal(part)
 		fmt.Println("FunctionCall or Args nil. Part:", string(res))
 		if result.UsageMetadata != nil {
-			return nil, int32(result.UsageMetadata.TotalTokenCount)
+			return PostCodeResponse{}, int32(result.UsageMetadata.TotalTokenCount)
 		}
-		return nil, 0
+		return PostCodeResponse{}, 0
 	}
 
 	// Marshal the function args to JSON and unmarshal into GeneratedCode
 	argsJSON, _ := json.Marshal(part.FunctionCall.Args)
-	var gen GeneratedCode
+	var gen PostCodeResponse
 	if err := json.Unmarshal(argsJSON, &gen); err != nil {
 		// If direct unmarshal to struct fails, try to inspect the raw args
 		fmt.Println("Failed to unmarshal args to GeneratedCode:", err)
 		fmt.Println("Raw args:", string(argsJSON))
 		if result.UsageMetadata != nil {
-			return nil, int32(result.UsageMetadata.TotalTokenCount)
+			return PostCodeResponse{}, int32(result.UsageMetadata.TotalTokenCount)
 		}
-		return nil, 0
+		return PostCodeResponse{}, 0
 	}
 
 	tkn := int32(0)
@@ -134,5 +147,5 @@ Use images (make your own svg and add that) and animations to make the UI more e
 	if err := conn.WriteJSON(map[string]string{"processing": "🎉 Done!"}); err != nil {
 		fmt.Println("WebSocket write error:", err)
 	}
-	return gen.Code, tkn
+	return gen, tkn
 }

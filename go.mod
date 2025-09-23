@@ -16,6 +16,7 @@ require (
 	github.com/vartanbeno/go-reddit/v2 v2.0.1
 	go.mongodb.org/mongo-driver v1.17.4
 	go.mongodb.org/mongo-driver/v2 v2.2.3
+	golang.org/x/oauth2 v0.30.0
 	google.golang.org/genai v1.22.0
 )
 
@@ -33,7 +34,7 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
-	github.com/klauspost/compress v1.17.4 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
@@ -47,7 +48,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect

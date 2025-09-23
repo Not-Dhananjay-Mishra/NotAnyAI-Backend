@@ -491,15 +491,15 @@ var NewToolDeciderAgent = genai.FunctionDeclaration{
 	},
 }
 
-var JSXTool = genai.FunctionDeclaration{
-	Name:        "jx",
-	Description: "Generates and returns valid React javascript (JSX) component code. The code must be self-contained, properly typed, and not include explanations or extra text.",
+var GenerateCode = genai.FunctionDeclaration{
+	Name:        "GenerateCode",
+	Description: "Generates and returns valid and working code for particular file for nextjs project. The code must be self-contained, properly typed, and not include explanations or extra text.",
 	Parameters: &genai.Schema{
 		Type: genai.TypeObject,
 		Properties: map[string]*genai.Schema{
 			"code": {
 				Type:        genai.TypeString,
-				Description: "A complete, valid React component written in javascript (JSX). Must be ready to compile without additional modifications. only the App file must be .js",
+				Description: "A complete, valid code for the specified file, including all necessary imports and exports.",
 			},
 		},
 		Required: []string{"code"},
@@ -508,33 +508,41 @@ var JSXTool = genai.FunctionDeclaration{
 
 var FilenameTool = genai.FunctionDeclaration{
 	Name:        "file",
-	Description: "Generates the necessary React .jsx file names for a given frontend design prompt. Each returned file name should be valid, descriptive, and suitable for use in a React project.",
+	Description: "Generates and returns valid Next.js project files as an array, including frontend and backend. Use pages/{page}.js for frontend pages and pages/api/{endpoint}.js for backend endpoints. Only return file names with extensions; do not include explanations.",
 	Parameters: &genai.Schema{
 		Type: genai.TypeObject,
 		Properties: map[string]*genai.Schema{
-			"file": {
+			"frontendFiles": {
 				Type:        genai.TypeArray,
-				Description: "A complete, valid React component written in javascript (JSX). Must be ready to compile without additional modifications.",
+				Description: "Frontend page files with extensions (.js or .jsx), e.g., pages/index.js, pages/about.jsx",
+				Items:       &genai.Schema{Type: genai.TypeString},
+			},
+			"backendFiles": {
+				Type:        genai.TypeArray,
+				Description: "Backend API files (.js) inside pages/api/, e.g., pages/api/hello.js, pages/api/data.js",
 				Items:       &genai.Schema{Type: genai.TypeString},
 			},
 		},
-		Required: []string{"file"},
+		Required: []string{"frontendFiles", "backendFiles"},
 	},
 }
 
 var PostCode = genai.FunctionDeclaration{
 	Name:        "files",
-	Description: "Fixes the given React code and returns every React component as a map. The map keys are filenames: use 'App.js' (only App keeps .js) and use '.jsx' for all other components. Each value must be the complete, valid React component code with correct Tailwind classes.",
+	Description: "",
 	Parameters: &genai.Schema{
 		Type: genai.TypeObject,
 		Properties: map[string]*genai.Schema{
-			"components": {
+			"frontendCode": {
 				Type:        genai.TypeObject,
-				Description: "A map where keys are React component filenames (App.js or other .jsx files) and values are their fixed, valid component code.",
-				// No Properties field → Gemini can freely return any keys
+				Description: "A map where keys are NextJS frontent component filenames (App.js or index.js or etc) dont include path and values are their fixed, valid code.",
+			},
+			"backendCode": {
+				Type:        genai.TypeObject,
+				Description: "A map where keys are NextJS Backend component filenames (App.js or index.js or etc) dont include path it is assumed it inside api and values are their fixed, valid code.",
 			},
 		},
-		Required: []string{"components"},
+		Required: []string{"frontendCode", "backendCode"},
 	},
 }
 
@@ -546,7 +554,7 @@ var RAG = genai.FunctionDeclaration{
 		Properties: map[string]*genai.Schema{
 			"rag": {
 				Type:        genai.TypeArray,
-				Description: "An array of Tailwind components needed to make web pages better, described in around 5 words and keep array length below or equals to 3",
+				Description: "An array of desgin styles to search on vector db",
 				Items:       &genai.Schema{Type: genai.TypeString},
 			},
 			"img": {

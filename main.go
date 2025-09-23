@@ -45,6 +45,8 @@ func main() {
 	utils.MONGODB_USERNAME = os.Getenv("MONGODB_USERNAME")
 	utils.MONGODB_PASSWORD = os.Getenv("MONGODB_PASSWORD")
 	utils.MONGODB_CLUSTER = os.Getenv("MONGODB_CLUSTER")
+	utils.GOOGLE_CLIENT_ID = os.Getenv("GOOGLE_CLIENT_ID")
+	utils.GOOGLE_CLIENT_SECRET = os.Getenv("GOOGLE_CLIENT_SECRET")
 
 	mongodb.DBinit()
 	// Start servers

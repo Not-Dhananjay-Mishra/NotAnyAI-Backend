@@ -16,7 +16,7 @@ import (
 
 type Process struct {
 	Data    Sus
-	ReplyCh chan map[string]string
+	ReplyCh chan PostCodeResponse
 	Conn    *websocket.Conn
 }
 
@@ -26,26 +26,28 @@ func init() {
 	UnderProcessCode = make(chan Process, 50)
 }
 
-const sysprompt = `You are a frontend code assistant. For any given prompt, 
-	determine only the necessary React .jsx file names the App file must be .js App.js and 
-	if required some other file in .js create that should exist to implement the described frontend design. Do not generate code, 
-	explanations, or extra text—only return valid file names via the provided tool.
-	The count of files should be kept to the absolute minimum required to fulfill the user's request.
-	no follow up questions.
-	`
+const sysprompt = `You are a frontend and backend code assistant for generating Next.js projects.
+For any given prompt, determine only the necessary files required to implement the described website.
+- Frontend pages must be returned in "frontendFiles" as .js files (e.g., pages/index.js, pages/about.js).
+- Backend API endpoints must be returned in "backendFiles" as .js files under pages/api/ (e.g., pages/api/hello.js).
+- Do not generate code, explanations, or extra text—only return valid file names via the provided tool.
+- Keep the count of files to the absolute minimum required to fulfill the user's request.
+- dont create nested file execpt pages and api only /pages/<filename>.js and /pages/api/<filename>.js nothing other than that
+- No follow-up questions.`
 
 type Sus struct {
 	Query string `json:"query"`
 }
 type GenAIResponse struct {
-	Filename []string `json:"file"`
+	FrontendFile []string `json:"frontendFiles"`
+	BackendFile  []string `json:"backendFiles"`
 }
 
 func GetRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var data Sus
 	json.NewDecoder(r.Body).Decode(&data)
-	replyCh := make(chan map[string]string, 1)
+	replyCh := make(chan PostCodeResponse, 1)
 	UnderProcessCode <- Process{Data: data, ReplyCh: replyCh}
 	result := <-replyCh
 	json.NewEncoder(w).Encode(result)
@@ -63,7 +65,7 @@ func Processor() {
 	}
 }
 
-func FileDecider(data Sus, conn *websocket.Conn) map[string]string {
+func FileDecider(data Sus, conn *websocket.Conn) PostCodeResponse {
 	c := models.GeminiModel()
 	ctx := context.Background()
 	config := &genai.GenerateContentConfig{
@@ -79,21 +81,31 @@ func FileDecider(data Sus, conn *websocket.Conn) map[string]string {
 		genai.Text(data.Query),
 		config,
 	)
+	fmt.Println(utils.Yellow(data.Query))
 	//fmt.Println(err)
 	res, _ := json.Marshal(result.Candidates[0].Content.Parts[0].FunctionCall.Args)
 	var suseee GenAIResponse
 	json.Unmarshal(res, &suseee)
-	fmt.Println(suseee.Filename)
+	fmt.Println(suseee)
 
 	//sending statis to conn
-	sendres(suseee.Filename, conn)
+	if len(suseee.FrontendFile) > 0 {
+		sendres(suseee.FrontendFile, conn)
+	}
+	if len(suseee.BackendFile) > 0 {
+		sendres(suseee.BackendFile, conn)
+	}
 
 	//itrative generating code
 	time.Sleep(time.Second * 2)
-	suse := ItrativeWithoutGo(suseee.Filename, data.Query, c, conn)
+	var AllFiles []string
+	AllFiles = append(AllFiles, suseee.BackendFile...)
+	AllFiles = append(AllFiles, suseee.FrontendFile...)
+
+	suse := ItrativeWithoutGo(AllFiles, data.Query, c, conn)
 	//return suse
 	content := MapToContent(suse, conn)
-	sus := CodingPostProcessor(content, conn, data.Query, suseee.Filename, "")
+	sus := CodingPostProcessor(content, conn, data.Query, AllFiles, "")
 	return sus
 }
 

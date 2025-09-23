@@ -66,8 +66,14 @@ func HandleConn(conn *websocket.Conn, username string) {
 				conn.WriteJSON(map[string]string{"processing": "You have exhausted your limit. Please talk to developer to continue using the service."})
 				continue
 			}
+
+			if data.Query == "sus" {
+				conn.WriteJSON(SusTemp())
+				continue
+			}
+
 			mongodb.UpdateLimit(username, linit-1)
-			replyCh := make(chan map[string]string, 1)
+			replyCh := make(chan codingmodel.PostCodeResponse, 1)
 			codingmodel.UnderProcessCode <- codingmodel.Process{Data: codingmodel.Sus{Query: data.Query}, ReplyCh: replyCh, Conn: conn}
 			result := <-replyCh
 			conn.WriteJSON(result)

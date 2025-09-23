@@ -77,7 +77,6 @@ func RouterHandler() {
 	router.HandleFunc("/api/code", codingmodel.GetRequest).Methods("POST")
 	router.HandleFunc("/api/rag/sendtodb", rag.RAGSend).Methods("POST")
 	router.HandleFunc("/api/rag/lookup", rag.RAGLookup).Methods("POST")
-
 	corsWrappedRouter := corsMiddleware(router)
 
 	// Use dynamic port in production
