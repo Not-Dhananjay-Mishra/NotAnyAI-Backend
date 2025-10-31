@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	mongodb "server/database/MongoDB"
-	codingmodel "server/models/CodingModel"
+	"server/models/sitecraft"
 	"server/router"
 	"server/utils"
 
@@ -27,7 +27,7 @@ func loadEnv() {
 func main() {
 	// Load env variables for local development
 	loadEnv()
-	go codingmodel.Processor()
+	go sitecraft.Processor()
 	// Assign environment variables to utils
 	utils.GEMINI_API = os.Getenv("GEMINI_API")
 	utils.NEWS_API = os.Getenv("NEWS_API")

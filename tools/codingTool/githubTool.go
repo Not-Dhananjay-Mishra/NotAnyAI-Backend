@@ -6,7 +6,7 @@ import (
 	"log"
 	"server/utils"
 
-	"github.com/google/go-github/v74/github"
+	"github.com/google/go-github/v76/github"
 )
 
 func GetReadMeGithub(owner string, repo string) string {
@@ -36,7 +36,6 @@ func GetRepoGithub(query string) []utils.GithubRepo {
 		Sort:  "stars",
 		Order: "desc",
 	}
-
 	result, _, err := client.Search.Repositories(context.Background(), query, opts)
 	if err != nil {
 		log.Fatalf("Search failed: %v", err)
