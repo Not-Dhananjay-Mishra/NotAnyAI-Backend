@@ -78,9 +78,16 @@ func SiteCraftAIModel(data Sus, conn *websocket.Conn) AIPostCodeResponse {
 		genkit.WithPlugins(&googlegenai.GoogleAI{}),
 		genkit.WithDefaultModel("googleai/gemini-2.5-pro"), // reliable full model
 	)
+	updateFrontend := genkit.DefineTool(g, "giveUpdateToUser", "tool use for giving updates to the end user during code genration like breif thinking, files name, etc",
+		func(ctx *ai.ToolContext, input string) (string, error) {
+			conn.WriteJSON(utils.Response{Text: input})
+			return "Update sent to user", nil
+		},
+	)
 
 	prompt := fmt.Sprintf(`
 You are a frontend and backend code assistant for generating Next.js projects.
+Use Tool "giveUpdateToUser" to provide real-time updates to the user during code generation.
 For any given prompt, determine only the necessary files required to implement the described website.
 - Frontend pages must be returned in "frontendFiles" as .js files (e.g., index.js, about.js).
 - Backend API endpoints must be returned in "backendFiles" as .js files under (e.g., hello.js).
@@ -124,7 +131,7 @@ Backend rules:
 }
 `, data.Query)
 	var typee PostCodeResponse
-	resp, err := genkit.Generate(ctx, g, ai.WithPrompt(prompt), ai.WithOutputType(&typee))
+	resp, err := genkit.Generate(ctx, g, ai.WithPrompt(prompt), ai.WithOutputType(&typee), ai.WithTools(updateFrontend))
 	if err != nil {
 		log.Printf("Error generating code: %v", err)
 		sendError(conn, "AI model failed to generate code.")
