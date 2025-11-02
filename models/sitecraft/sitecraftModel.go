@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"server/utils"
+	"sync"
 
 	"github.com/firebase/genkit/go/ai"
 	"github.com/firebase/genkit/go/genkit"
@@ -55,6 +56,10 @@ func init() {
 	UnderProcessCodeNew = make(chan Process, 50)
 }
 
+type WhatAmIDoing struct {
+	Description string `json:"description" jsonschema_description:"what am u doing right now in brief like breif thinking, files name, etc use emojis also"`
+}
+
 // Processor continuously listens for code generation requests
 func Processor() {
 	for {
@@ -69,6 +74,8 @@ func Processor() {
 	}
 }
 
+var writeMu sync.Mutex
+
 // Core function that interacts with Google’s Gemini via Genkit
 func SiteCraftAIModel(data Sus, conn *websocket.Conn) AIPostCodeResponse {
 	ctx := context.Background()
@@ -79,8 +86,12 @@ func SiteCraftAIModel(data Sus, conn *websocket.Conn) AIPostCodeResponse {
 		genkit.WithDefaultModel("googleai/gemini-2.5-pro"), // reliable full model
 	)
 	updateFrontend := genkit.DefineTool(g, "giveUpdateToUser", "tool use for giving updates to the end user during code genration like breif thinking, files name, etc",
-		func(ctx *ai.ToolContext, input string) (string, error) {
-			conn.WriteJSON(utils.Response{Text: input})
+		func(ctx *ai.ToolContext, input WhatAmIDoing) (string, error) {
+			writeMu.Lock()
+			defer writeMu.Unlock()
+			if err := conn.WriteJSON(utils.Response{Text: input.Description + "\n"}); err != nil {
+				return "", err
+			}
 			return "Update sent to user", nil
 		},
 	)
@@ -96,7 +107,7 @@ For any given prompt, determine only the necessary files required to implement t
 - dont create nested file execpt pages and api only <filename>.js and <filename>.js nothing other than that
 - No follow-up questions.
 User request: "%s"
-
+Dont make any type of config files like package.json, tailwind.config.js, next.config.js, etc.
 Generate:
 1. Frontend code (NextJS + Tailwind) as JS files.
 2. Backend code (NextJS + JSON API).
