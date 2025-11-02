@@ -31,8 +31,8 @@ type GenAIResponse struct {
 
 // Struct for the formatted response we’ll send to the frontend
 type FileData struct {
-	Filename string `json:"filename" jsonschema_description:"Name of the code file"`
-	Content  string `json:"content" jsonschema_description:"File content"`
+	Filename string `json:"filename" jsonschema_description:"Name of the code file dont add pages/ or api/ just the filename with .js extension and dont make nested files(like product/[id].js) only simple filenames"`
+	Content  string `json:"content" jsonschema_description:"File content "`
 }
 
 type PostCodeResponse struct {
