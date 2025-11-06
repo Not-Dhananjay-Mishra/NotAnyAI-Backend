@@ -17,17 +17,12 @@ import (
 type AIPostCodeResponse struct {
 	FrontendCode map[string]string `json:"frontendCode"`
 	BackendCode  map[string]string `json:"backendCode"`
+	JSONFile     string            `json:"jsonfile"`
 }
 
 // Struct representing an incoming request to generate code
 type Sus struct {
 	Query string `json:"query"`
-}
-
-// Struct for the AI model’s raw output
-type GenAIResponse struct {
-	FrontendFile []string `json:"frontendFiles"`
-	BackendFile  []string `json:"backendFiles"`
 }
 
 // Struct for the formatted response we’ll send to the frontend
@@ -39,6 +34,7 @@ type FileData struct {
 type PostCodeResponse struct {
 	FrontendCode []FileData `json:"frontendCode" jsonschema_description:"List of frontend files"`
 	BackendCode  []FileData `json:"backendCode" jsonschema_description:"List of backend files"`
+	JSONFile     string     `json:"jsonfile" jsonschema_description:"code of package.json file will all packages and dependencies everything working for next js" `
 }
 
 // Struct for handling in-progress jobs
@@ -113,7 +109,7 @@ Generate:
 2. Backend code (NextJS + JSON API).
 Return JSON in this exact format:
 Allowed libraries and environment:
-2) Frontend(Next.js): React 18.2.0, react-dom 18.2.0, framer-motion 11.2.6, Tailwind CSS. No other libraries.
+2) Frontend(Next.js): React 18.2.0, react-dom 18.2.0, framer-motion 11.2.6, Tailwind CSS.
 3) Backend: Next.js API route handlers only. No external packages.
 
 Frontend rules:
@@ -139,6 +135,7 @@ Backend rules:
   "backendCode": {
     "hello.js": "<code>"
   },
+  "jsonfile": "<code>"
 }
 `, data.Query)
 	var typee PostCodeResponse
@@ -160,6 +157,7 @@ Backend rules:
 	return AIPostCodeResponse{
 		FrontendCode: frontendCodeMap,
 		BackendCode:  backendCodeMap,
+		JSONFile:     typee.JSONFile,
 	}
 }
 
