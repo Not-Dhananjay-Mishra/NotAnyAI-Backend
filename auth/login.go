@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var claims = &JWTCredientials{
 		Username: data.Username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 340).Unix(),
 		},
 	}
 
