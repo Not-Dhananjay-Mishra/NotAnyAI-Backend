@@ -34,7 +34,7 @@ type FileData struct {
 type PostCodeResponse struct {
 	FrontendCode []FileData `json:"frontendCode" jsonschema_description:"List of frontend files"`
 	BackendCode  []FileData `json:"backendCode" jsonschema_description:"List of backend files"`
-	JSONFile     string     `json:"jsonfile" jsonschema_description:"code of package.json file will all packages and dependencies everything working for next js must include name=webcontainer-nextjs-tailwind-app type=module dev=next dev next =^14.0.0"`
+	JSONFile     string     `json:"jsonfile" jsonschema_description:"code of package.json file will all packages and dependencies everything working for next js must include name=webcontainer-nextjs-tailwind-app type=module script - dev='next dev' dependencies: {react: '^18.2.0', 'react-dom': '^18.2.0', next: '^14.0.0', tailwindcss: '^3.3.2', postcss: '^8.4.21', autoprefixer: '^10.4.14'}"`
 }
 
 // Struct for handling in-progress jobs
