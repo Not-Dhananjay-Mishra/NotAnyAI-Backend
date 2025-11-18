@@ -79,7 +79,7 @@ func SiteCraftAIModel(data Sus, conn *websocket.Conn) AIPostCodeResponse {
 	// Initialize Genkit with Google Gemini
 	g := genkit.Init(ctx,
 		genkit.WithPlugins(&googlegenai.GoogleAI{}),
-		genkit.WithDefaultModel("googleai/gemini-2.5-pro"), // reliable full model
+		genkit.WithDefaultModel("googleai/gemini-3-pro"), // reliable full model
 	)
 	updateFrontend := genkit.DefineTool(g, "giveUpdateToUser", "tool use for giving updates to the end user during code genration like breif thinking, files name, etc",
 		func(ctx *ai.ToolContext, input WhatAmIDoing) (string, error) {
