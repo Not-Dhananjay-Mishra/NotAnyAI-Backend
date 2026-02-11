@@ -17,7 +17,7 @@ func loadEnv() {
 		if err := godotenv.Load(); err != nil {
 			log.Println("Warning: Could not load .env file:", err)
 		} else {
-			log.Println("Loaded environment variables from .env")
+			log.Println("Loaded environment variables s from .env")
 		}
 	} else {
 		log.Println(".env file not found, assuming environment variables are set by the host")
@@ -60,3 +60,4 @@ func main() {
 
 	<-blocker
 }
+
